@@ -13,8 +13,12 @@ class CreateDocumentTypesTable extends Migration
      */
     public function up()
     {
-        Schema::table('document_types', function (Blueprint $table) {
-            //
+        Schema::create('document_types', function (Blueprint $table) {
+            $table->increments('id');
+            $table->uuid('reference');
+            $table->string('description');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,8 +29,6 @@ class CreateDocumentTypesTable extends Migration
      */
     public function down()
     {
-        Schema::table('document_types', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('document_types');
     }
 }

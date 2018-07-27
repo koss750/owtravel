@@ -13,8 +13,12 @@ class CreateLinkTypesTable extends Migration
      */
     public function up()
     {
-        Schema::table('link_types', function (Blueprint $table) {
-            //
+        Schema::create('link_types', function (Blueprint $table) {
+            $table->increments('id');
+            $table->uuid('reference');
+            $table->string('prefix');
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,8 +29,6 @@ class CreateLinkTypesTable extends Migration
      */
     public function down()
     {
-        Schema::table('link_types', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('link_types');
     }
 }
