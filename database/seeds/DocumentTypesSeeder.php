@@ -1,5 +1,7 @@
 <?php
 
+use App\DocumentTypes;
+use Faker\Provider\Uuid;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Testing\Fakes;
@@ -19,9 +21,12 @@ class DocumentTypesSeeder extends Seeder
 
         foreach ($types as $type) {
 
-            DB::table('document_types')->insert([
-                'description' => $type,
-                'reference' => $faker->randomAscii
-            ]);
+            $doc_type = new DocumentTypes;
+
+            $doc_type->description = $type;
+
+            $doc_type->reference = Uuid::uuid();
+
+            $doc_type->save();
         }
     }   }

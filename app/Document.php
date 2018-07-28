@@ -2,10 +2,12 @@
 
 namespace App;
 
+
 use BaseModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class Document extends BaseModel
+class Document extends Model
 {
     use Notifiable;
 

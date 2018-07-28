@@ -19,4 +19,8 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/mydocuments/{id}', 'DocumentController@my_docs');
+Route::get('/documents', 'DocumentController@index');
+Route::get('/users', 'HomeController@users');
+
 

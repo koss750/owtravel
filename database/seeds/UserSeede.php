@@ -17,10 +17,11 @@ class UserSeede extends Seeder
 
         foreach (range(1, 20) as $index) {
 
-            DB::table('users')->insert([
-                'name' => $faker->name,
-                'email' => $faker->email,
-                'password' => bcrypt('secret'),
-            ]);
+            $user = new \App\User;
+            $user->email = $faker->email;
+            $user->name = $faker->name;
+            $user->password = bcrypt('secret');
+            $user->save();
+
         }
     }   }
