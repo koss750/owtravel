@@ -9,11 +9,14 @@ class Document extends BaseModel
 {
     use Notifiable;
 
+    protected $table = 'documents';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
+
     protected $fillable = [
       
     ];
