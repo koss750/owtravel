@@ -19,3 +19,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/test', 'HomeController@test')->middleware('auth:api');
 
+Route::group([
+    'prefix' => 'auth'
+], function () {
+    Route::post('login', 'HomeController@login');
+    Route::post('signup', 'HomeController@signup');
+
+    Route::group([
+        'middleware' => 'auth:api'
+    ], function() {
+        Route::get('logout', 'HomeController@logout');
+        Route::get('user', 'HomeController@user');
+    });}
+);
