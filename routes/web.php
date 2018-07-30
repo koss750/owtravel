@@ -22,6 +22,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/mydocuments/{id}', 'DocumentController@my_docs');
 Route::get('/documents', 'DocumentController@index')->middleware('auth:api');
 Route::get('/users', 'HomeController@users');
+Route::post('/file', 'FileController@store');
 
 
 Route::middleware('auth:api')->get('/tests', function (Request $request) {

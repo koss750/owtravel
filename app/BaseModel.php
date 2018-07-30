@@ -6,10 +6,13 @@
  * Time: 18:59
  */
 
+namespace App;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /** * Class BaseModel * @property int id * @property string reference * @package App */
+
 
 
 class BaseModel extends Model

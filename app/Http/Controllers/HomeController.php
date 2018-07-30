@@ -7,6 +7,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -63,6 +64,14 @@ class HomeController extends Controller
      * @return [string] token_type
      * @return [string] expires_at
      */
+
+    public function store(Request $request)
+    {
+        echo "getting here";
+        $path = Storage::putFile('avatars', $request->file('uploaded_file'));
+        return $path;
+    }
+
     public function login(Request $request)
     {
         $request->validate([

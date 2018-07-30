@@ -2,11 +2,10 @@
 
 namespace App;
 
-use BaseModel;
 
 class File extends BaseModel
 {
 
-    protected $table = 'documents';
+    protected $table = 'files';
 
 }
