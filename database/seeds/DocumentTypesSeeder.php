@@ -16,17 +16,15 @@ class DocumentTypesSeeder extends Seeder
     public function run()
     {
         $faker = Faker\Factory::create();
+        DocumentTypes::truncate();
 
-        $types = ["passport", "brp", 'driving license'];
+        $types = ["passport", "brp", 'driving license', 'visa', 'id photo'];
 
         foreach ($types as $type) {
 
             $doc_type = new DocumentTypes;
-
             $doc_type->description = $type;
-
             $doc_type->reference = Uuid::uuid();
-
             $doc_type->save();
         }
     }   }

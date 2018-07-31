@@ -1,5 +1,6 @@
 <?php
 
+use App\Country;
 use App\DocumentTypes;
 use App\User;
 use Faker\Provider\Uuid;
@@ -25,6 +26,8 @@ class DocumentSeeder extends Seeder
             $doc->user_id = $userId;
             $doc->reference = Uuid::uuid();
             $doc->document_type_id = DocumentTypes::all()->random()->id;
+            $doc->issue_country = Country::all()->random()->iso_3;
+            $doc->number = rand('20100000', '50999000');
             $doc->description = $faker->creditCardNumber;
             $doc->document_link_type_id = $faker->randomNumber(1);
             $doc->link = $faker->domainName;
