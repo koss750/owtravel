@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call(DocumentTypesSeeder::class);
         $this->call(DocumentSeeder::class);
         $this->call(LinkTypeSeeder::class);
+        $this->call(FamilyMembersSeeder::class);
+        $this->call(FamiliesSeeder::class);
 
     }
 }
