@@ -22,6 +22,11 @@ class HomeController extends Controller
 
         }
 
+        //TODO: fix file linking system - what is connected to what and where is it stored
+        //TODO: fix family recursion
+        //TODO: NEXT BIG STEP BACKEND - RETURN FILE LINK PATHS WITH DOCUMENTS
+        //TODO: NEXT BIG STEP FRONTEND - RETURN PERSONS DOCUMENT PICTURES
+
         /**
          * Show the application dashboard.
          *
