@@ -9,12 +9,17 @@ namespace App\Http\Transformers;
 
 use App\Document;
 use App\DocumentTypes;
+use App\User;
 use League\Fractal;
 
 class DocumentTransformer extends Fractal\TransformerAbstract
 {
+
+
     public function transform(Document $doc)
     {
+            $user = User::where('id', $doc->user_id)->firstOrFail();
+
         try {
             $type = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
             $typeName = $type->description;
@@ -28,4 +33,7 @@ class DocumentTransformer extends Fractal\TransformerAbstract
             abort(500, "failed to transform document $doc->id");
         }
     }
+
+
+
 }
