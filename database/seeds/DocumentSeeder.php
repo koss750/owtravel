@@ -18,6 +18,7 @@ class DocumentSeeder extends Seeder
     public function run()
     {
         $faker = Faker\Factory::create();
+        \App\Document::truncate();
 
         foreach (range(1, 100) as $index) {
 
@@ -29,7 +30,7 @@ class DocumentSeeder extends Seeder
             $doc->issue_country = Country::all()->random()->iso_3;
             $doc->number = rand('20100000', '50999000');
             $doc->description = $faker->creditCardNumber;
-            $doc->document_link_type_id = $faker->randomNumber(1);
+            $doc->document_link_type_id = \App\LinkType::all()->random()->id;
             $doc->link = $faker->domainName;
             $doc->save();
 
