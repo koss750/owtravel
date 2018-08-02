@@ -17,7 +17,7 @@ class FamiliesSeeder extends Seeder
     {
             Family::truncate();
 
-            foreach (range(1, 30) as $index) {
+            foreach (range(1, 50) as $index) {
 
                     $userId = User::all()->random()->id;
                     $relatesTo = User::all()->random()->id;
@@ -29,15 +29,6 @@ class FamiliesSeeder extends Seeder
                     $member = FamilyMember::where('id', $memberId)->firstOrFail();
                     $family->member_id = $memberId;
                     $family->save();
-                    $family_inverse = new Family;
-                    $inverse_member = FamilyMember::where('inverse_of', $member->description)->firstOrFail();
-                    $inverse_member_id = $inverse_member->id;
-                    $family_inverse->user_id = $relatesTo;
-                    $family_inverse->relates_to = $userId;
-                    $family_inverse->member_id = $inverse_member_id;
-                    $family_inverse->reference = Uuid::uuid();
-                    $family_inverse->save();
-
 
             }
     }

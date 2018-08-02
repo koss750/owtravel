@@ -11,6 +11,9 @@
 |
 */
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -19,10 +22,10 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/mydocuments/{id}', 'DocumentController@my_docs');
-Route::get('/familydocuments/{id}', 'DocumentController@family_docs');
+Route::get('/documents/{id}', 'DocumentController@my_docs');
 Route::get('/documents', 'DocumentController@index')->middleware('auth:api');
 Route::get('/users', 'HomeController@users');
+Route::get('/test', 'HomeController@test');
 Route::get('/user/{id}', 'HomeController@my_user');
 Route::post('/file', 'FileController@store');
 

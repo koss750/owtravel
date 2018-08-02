@@ -15,14 +15,15 @@ use League\Fractal;
 
 class UserTransformer extends Fractal\TransformerAbstract
 {
+
 protected $defaultIncludes = ['docs', 'family'];
 
     public function transform(User $user)
     {
         try {
             return [
-                'id' => $user->reference,
-                'name' => $user->name
+                'name' => $user->name,
+                'email' => $user->email
             ];
         } catch (\Exception $e) {
             abort(500, "failed to transform user $user->id");
@@ -34,13 +35,10 @@ protected $defaultIncludes = ['docs', 'family'];
                 return $this->collection($docs, new DocumentTransformer);
     }
         public function includeFamily(User $user) {
-                $family_id_array = [];
-                $family = Family::where('user_id', $user->id)->get();
-                foreach ($family as $item) {
-                        array_push($family_id_array, $item->relates_to);
-                }
-                $relations = User::whereIn('id', $family_id_array)->get();
-                return $this->collection($relations, new UserTransformer);
+                $transformer = new FamilyUserTransformer;
+                $transformer->family_member=$user;
+                $family = User::familyOf($user->id);
+                if($family!=0) return $this->collection($family, $transformer);
         }
 
 

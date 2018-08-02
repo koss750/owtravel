@@ -6,6 +6,7 @@ use App\Document;
 use App\Http\Transformers\UserTransformer;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -39,7 +40,9 @@ class HomeController extends Controller
 
         public function test()
         {
-                return Document::all();
+
+                $family = User::where('id', 1)->get();
+                return $this->respond($this->showCollection($family, new UserTransformer));
         }
 
         public function signup(Request $request)

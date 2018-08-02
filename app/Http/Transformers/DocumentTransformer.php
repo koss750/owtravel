@@ -7,6 +7,7 @@
  */
 namespace App\Http\Transformers;
 
+use App\Country;
 use App\Document;
 use App\DocumentTypes;
 use App\User;
@@ -15,25 +16,24 @@ use League\Fractal;
 class DocumentTransformer extends Fractal\TransformerAbstract
 {
 
-
     public function transform(Document $doc)
     {
-            $user = User::where('id', $doc->user_id)->firstOrFail();
-
         try {
             $type = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
             $typeName = $type->description;
+            $country = Country::where('iso_3', $doc->issue_country)->firstOrFail();
+            $country = $country->iso_3 . " ($country->title)";
+
             return [
                 'id' => $doc->reference,
                 'type' => $typeName,
-                'number' => $doc->description,
+                'number' => $doc->number,
+                'issued_by' => $country,
                 'link' => $doc->link
             ];
         } catch (\Exception $e) {
             abort(500, "failed to transform document $doc->id");
         }
     }
-
-
 
 }
