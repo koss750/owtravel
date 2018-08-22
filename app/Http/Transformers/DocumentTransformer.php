@@ -22,15 +22,20 @@ class DocumentTransformer extends Fractal\TransformerAbstract
             $type = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
             $typeName = $type->description;
             $country = Country::where('iso_3', $doc->issue_country)->firstOrFail();
+            $country_code = $country->iso_3;
             $country = $country->iso_3 . " ($country->title)";
 
-            return [
+
+            $transformedObject = [
                 'id' => $doc->reference,
                 'type' => $typeName,
                 'number' => $doc->number,
                 'issued_by' => $country,
+                'issued_by_code' => $country_code,
                 'link' => $doc->link
             ];
+
+            return $transformedObject;
         } catch (\Exception $e) {
             abort(500, "failed to transform document $doc->id");
         }
