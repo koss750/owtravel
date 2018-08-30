@@ -12,6 +12,7 @@ use App\Document;
 use App\DocumentTypes;
 use App\TravelProgramme;
 use App\User;
+use Carbon\Carbon;
 use League\Fractal;
 
 class TravelProgrammeTransformer extends Fractal\TransformerAbstract
@@ -21,6 +22,10 @@ class TravelProgrammeTransformer extends Fractal\TransformerAbstract
     {
         try {
 
+            $start = new Carbon($travelProgramme->start_date);
+            $end = new Carbon($travelProgramme->end_date);
+            $length = $end->diffInDays($start,true);
+            $main_iso_2 = Country::where('iso_3', $travelProgramme->countries)->firstOrFail()->iso_2;
 
 
             $transformedObject = [
@@ -30,7 +35,9 @@ class TravelProgrammeTransformer extends Fractal\TransformerAbstract
                 'start' => $travelProgramme->start_date,
                 'end' => $travelProgramme->end_date,
                 'destination' => $travelProgramme->main_destination,
-                'score' => $travelProgramme->coolness_factor
+                'main_flag_code' => $main_iso_2,
+                'score' => $travelProgramme->coolness_factor,
+                'length' => $length
             ];
 
             return $transformedObject;

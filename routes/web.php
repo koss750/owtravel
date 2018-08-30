@@ -23,6 +23,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/documents/{id}', 'DocumentController@my_docs')->middleware('auth:api');
+Route::get('/programmes', 'TravelProgrammeController@index')->middleware('auth:api');
 Route::get('/documents', 'DocumentController@index')->middleware('auth:api');
 Route::get('/users', 'HomeController@users');
 Route::get('/test', 'HomeController@test');
