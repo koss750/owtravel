@@ -35,9 +35,9 @@ class LinkHookController extends Controller
         return $this->respond("Link system active");
     }
 
-    public function waterlooEast()
+    public function waterlooEast($ifttt)
     {
-
+        $this->action = $ifttt;
         //$this->dieIfOutsideHours([14, 22], ["Wed", "Sat", "Sun"]);
 
         $mainJsonResponse = $this->national_rail_station_live("LBG", "MRN");
