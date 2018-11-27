@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request as Guzl;
+use GuzzleHttp;
 
 class LinkHookController extends Controller
 {
@@ -10,6 +10,7 @@ class LinkHookController extends Controller
     public $action;
     public $hook;
     public $code;
+    public $client;
     private $base_url;
 
     /**
@@ -18,6 +19,8 @@ class LinkHookController extends Controller
      */
     public function __construct()
     {
+        $this->client = new GuzzleHttp\Client();
+
     }
 
     /**
@@ -26,6 +29,11 @@ class LinkHookController extends Controller
     public function index()
     {
         echo "Link system active";
+    }
+
+    public function apiObjectResponse($url) {
+        $response = $this->client->get($url);
+        return json_decode($response->getBody()->getContents());
     }
 
     public function waterlooEast($ifttt)
@@ -41,18 +49,20 @@ class LinkHookController extends Controller
         $drivingCondition = $this->trafficCondition($trafficRatio);
         $walkingTime = 5;
 
-        $mainJsonResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
-        $times = $this->nationalRailSpecificTrain($mainJsonResponse, 0, $departingStn, $arrivalStn);
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
+        $times = $this->nationalRailSpecificTrain($mainResponse, 0, $departingStn, $arrivalStn);
         $timeMarden = $times[0];
-        $timeHome = date('H:i', strtotime("$timeMarden + $drivingTime + $walkingTime"));
+        $timeAfterMardenInMinutes = $drivingTime+$walkingTime;
+        $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
         $statusTrain = $times[2];
-        $statusRoad = $drivingCondition . " - $drivingTime minutes";
 
         $value1 = "Dear Mrs Pikisso. ETA $timeHome";
-        $value2 = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $statusRoad, ETA $timeHome. Have a wonderful evening.";
+        $value2 = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
         $url = $this->constructUrl([$value1, $value2]);
         dd($url);
+
+        $this->client->get($url);
 
     }
 
@@ -67,18 +77,12 @@ class LinkHookController extends Controller
         $value2 .= $signature;
         $trigger_url = $this->base_url . "value1=$value1";
         if ($value2) $trigger_url .= "&value2=$value2";
+        $trigger_url .= $signature;
 
         return $trigger_url;
 
     }
 
-    private function trigger($url)
-    {
-
-        $client = new Guzl;
-        $client->get($url); // 200
-
-    }
 
     private function debug($url, $line_one, $line_two)
     {
@@ -141,12 +145,12 @@ class LinkHookController extends Controller
         //[4] traffic conditions
     }
 
-    private function nationalRailSpecificTrain($json, $n, $departingStn, $arrivalStn)
+    private function nationalRailSpecificTrain($mainResponse, $n, $departingStn, $arrivalStn)
     {
 
-        $detailedUrl = $json->departures->all[$n]->service_timetable->id;
-        $deep_response = file_get_contents($detailedUrl);
-        $data = json_decode($deep_response);
+        $detailedUrl = $mainResponse->departures->all[$n]->service_timetable->id;
+        $data = $this->apiObjectResponse($detailedUrl);
+        $result = [];
         foreach ($data->stops as $stop) {
 
             if ($stop->station_code == $departingStn) {
@@ -166,6 +170,8 @@ class LinkHookController extends Controller
                 $result[1] = date('H:i', strtotime("$result[0]"));
             }
         }
+
+        return $result;
 
     }
 
@@ -191,16 +197,14 @@ class LinkHookController extends Controller
 
     private function nationalRailStationLive($departingStn, $arrivalStn)
     {
-        $response = file_get_contents("https://transportapi.com/v3/uk/train/station/$departingStn/live.json?app_id=429b0914&app_key=11628415a6ae399d6b46ea2c4511f074&calling_at=$arrivalStn&darwin=true&train_status=passenger");
-        return json_decode($response);
+        return $this->apiObjectResponse("https://transportapi.com/v3/uk/train/station/$departingStn/live.json?app_id=429b0914&app_key=11628415a6ae399d6b46ea2c4511f074&calling_at=$arrivalStn&darwin=true&train_status=passenger");
     }
 
     private function googleDrivingTime($from, $to)
     {
-        $api_url = "https://maps.googleapis.com/maps/api/directions/json?origin=$from&destination=$to&departure_time=now&language=en&key=AIzaSyCT2G-01NRshhoFDT4GLInBTiIlvra5fIk";
-        $json = json_decode(file_get_contents($api_url));
-        $duration = $json->routes[0]->legs[0]->duration->value;
-        $duration_in_traffic = $json->routes[0]->legs[0]->duration_in_traffic->value;
+        $response = $this->apiObjectResponse("https://maps.googleapis.com/maps/api/directions/json?origin=$from&destination=$to&departure_time=now&language=en&key=AIzaSyCT2G-01NRshhoFDT4GLInBTiIlvra5fIk");
+        $duration = $response->routes[0]->legs[0]->duration->value;
+        $duration_in_traffic = $response->routes[0]->legs[0]->duration_in_traffic->value;
         $ratio = (($duration_in_traffic - $duration) / $duration) * 100;
         $in_minutes = $duration / 60;
         $in_minutes_in_traffic = $duration / 60;

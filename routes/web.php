@@ -34,3 +34,10 @@ Route::post('/file', 'FileController@store');
 Route::middleware('auth:api')->get('/tests', function (Request $request) {
     return $request->user();
 });
+
+//LINK system routes
+
+Route::group(['prefix' => 'link'], function () {
+    Route::get('status', 'LinkHookController@index');
+    Route::get('waterloo/{ifttt}', 'LinkHookController@waterlooEast');
+});
