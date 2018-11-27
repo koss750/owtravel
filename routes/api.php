@@ -21,7 +21,7 @@ Route::post('/file', 'HomeController@store');
 
 Route::group(['prefix' => 'link'], function () {
     Route::get('status', 'LinkHookController@index');
-    Route::get('waterloo/{ifttt}', 'LinkHookController@waterlooEast');
+    Route::get('waterloo', 'LinkHookController@waterlooEast');
 });
 
 Route::group([
