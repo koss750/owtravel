@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Client as Guzl;
+use Illuminate\Http\Request as Guzl;
 
-class LinkController extends Controller
+class LinkHookController extends Controller
 {
 
     public $action;
@@ -17,7 +17,7 @@ class LinkController extends Controller
      *
      * @return void
      */
-    public function __construct($ifttt, $hook, $code)
+    public function __construct($ifttt)
     {
         $this->action = $ifttt;
         //$this->hook = $hook;
