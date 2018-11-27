@@ -33,18 +33,26 @@ class LinkHookController extends Controller
         $this->action = $ifttt;
         //$this->dieIfOutsideHours([14, 22], ["Wed", "Sat", "Sun"]);
 
-        $mainJsonResponse = $this->national_rail_station_live("LBG", "MRN");
-        $times = $this->get_nth_train($mainJsonResponse, 0);
+        $departingStn = "LBG";
+        $arrivalStn = "MRN";
+        $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 5;
+
+        $mainJsonResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
+        $times = $this->nationalRailSpecificTrain($mainJsonResponse, 0, $departingStn, $arrivalStn);
         $timeMarden = $times[0];
-        $timeHome = $times[1];
+        $timeHome = date('H:i', strtotime("$timeMarden + $drivingTime + $walkingTime"));
         $statusTrain = $times[2];
-        $statusRoad = $times[4];
+        $statusRoad = $drivingCondition . " - $drivingTime minutes";
 
         $value1 = "Dear Mrs Pikisso. ETA $timeHome";
         $value2 = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $statusRoad, ETA $timeHome. Have a wonderful evening.";
 
         $url = $this->constructUrl([$value1, $value2]);
-        $this->trigger($url);
+        dd($url);
 
     }
 
@@ -93,13 +101,8 @@ class LinkHookController extends Controller
     private function process_response($data)
     {
 
-        $hook = $_GET['hook'];
-        $drivingTime = 0;
-        $walkingTime = 0;
-        $drivingCondition = "not busy";
 
-
-        switch ($hook) {
+        /*switch ($this->hook) {
             case "waterloo_east_trigger":
                 $departingStn = "LBG";
                 $arrivalStn = "MRN";
@@ -128,13 +131,27 @@ class LinkHookController extends Controller
                 $departingStn = "CHX";
                 $arrivalStn = "MRN";
                 break;
-        }
+        }*/
 
+
+        //[0] is train's arrival to destination
+        //[1] is person's arrival to destination
+        //[2] is status of train
+        //[3] estimated departure time of train
+        //[4] traffic conditions
+    }
+
+    private function nationalRailSpecificTrain($json, $n, $departingStn, $arrivalStn)
+    {
+
+        $detailedUrl = $json->departures->all[$n]->service_timetable->id;
+        $deep_response = file_get_contents($detailedUrl);
+        $data = json_decode($deep_response);
         foreach ($data->stops as $stop) {
 
             if ($stop->station_code == $departingStn) {
 
-                $result[2] = $this->process_train_status($stop->status);
+                $result[2] = $this->trainStatus($stop->status);
 
                 if (!empty($stop->expected_departure_time)) $result[3] = $stop->expected_departure_time;
                 else if (!empty($stop->aimed_departure_time)) $result[3] = $stop->aimed_departure_time;
@@ -146,33 +163,13 @@ class LinkHookController extends Controller
                 else if (!empty($stop->aimed_arrival_time)) $result[0] = $stop->aimed_arrival_time;
                 else $result[0] = "UNKNOWN";
 
-                $extra_time = $drivingTime + $walkingTime;
-
-                $result[1] = date('H:i', strtotime("$result[0] + $extra_time minutes"));
+                $result[1] = date('H:i', strtotime("$result[0]"));
             }
-
         }
 
-        return $result;
-
-        //[0] is train's arrival to destination
-        //[1] is person's arrival to destination
-        //[2] is status of train
-        //[3] estimated departure time of train
-        //[4] traffic conditions
     }
 
-    private function get_nth_train($json, $n)
-    {
-
-        $detailedUrl = $json->departures->all[$n]->service_timetable->id;
-        $deep_response = file_get_contents($detailedUrl);
-        $resArr = json_decode($deep_response);
-        return $this->process_response($resArr);
-
-    }
-
-    private function process_train_status($status)
+    private function trainStatus($status)
     {
         switch ($status) {
             case "STARTS HERE":
@@ -192,13 +189,13 @@ class LinkHookController extends Controller
         }
     }
 
-    private function national_rail_station_live($departingStn, $arrivalStn)
+    private function nationalRailStationLive($departingStn, $arrivalStn)
     {
         $response = file_get_contents("https://transportapi.com/v3/uk/train/station/$departingStn/live.json?app_id=429b0914&app_key=11628415a6ae399d6b46ea2c4511f074&calling_at=$arrivalStn&darwin=true&train_status=passenger");
         return json_decode($response);
     }
 
-    private function get_google_driving_time($from, $to)
+    private function googleDrivingTime($from, $to)
     {
         $api_url = "https://maps.googleapis.com/maps/api/directions/json?origin=$from&destination=$to&departure_time=now&language=en&key=AIzaSyCT2G-01NRshhoFDT4GLInBTiIlvra5fIk";
         $json = json_decode(file_get_contents($api_url));
@@ -213,7 +210,7 @@ class LinkHookController extends Controller
         return [$round_mins, $round_mins_in_traffic, $round_ratio];
     }
 
-    private function assign_traffic_condition($ratio)
+    private function trafficCondition($ratio)
     {
 
         if ($ratio > 120) $drivingCondition = "f*cked up! or Google is being weird.";
