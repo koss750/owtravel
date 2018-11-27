@@ -13,26 +13,19 @@ class LinkHookController extends Controller
     private $base_url;
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * LinkHookController constructor.
+     * @param $ifttt
      */
-    public function __construct($ifttt)
+    public function __construct()
     {
-        $this->action = $ifttt;
-        //$this->hook = $hook;
-        $this->base_url = "https://maker.ifttt.com/trigger/$ifttt/with/key/ckxswBFpZxAA6VGINNNUhII0B-8T17dlO4578uD8Cyk?";
-        //$this->code = $code;
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function index()
     {
-        return $this->respond("Link system active");
+        echo "Link system active";
     }
 
     public function waterlooEast($ifttt)
