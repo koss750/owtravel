@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp;
+use App\LinkHook;
 
 class LinkHookController extends Controller
 {
@@ -11,7 +11,10 @@ class LinkHookController extends Controller
     public $hook;
     public $code;
     public $client;
-    private $base_url;
+    public $googleApiUrl;
+    public $weatherApiUrl;
+    public $railApiUrl;
+    private $iftttApiUrl;
 
     /**
      * LinkHookController constructor.
@@ -19,7 +22,6 @@ class LinkHookController extends Controller
      */
     public function __construct()
     {
-        $this->client = new GuzzleHttp\Client();
 
     }
 
@@ -29,11 +31,6 @@ class LinkHookController extends Controller
     public function index()
     {
         echo "Link system active";
-    }
-
-    public function apiObjectResponse($url) {
-        $response = $this->client->get($url);
-        return json_decode($response->getBody()->getContents());
     }
 
     public function waterlooEast($ifttt)
@@ -50,57 +47,20 @@ class LinkHookController extends Controller
         $walkingTime = 5;
 
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
-        $times = $this->nationalRailSpecificTrain($mainResponse, 0, $departingStn, $arrivalStn);
+        $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         $timeMarden = $times[0];
         $timeAfterMardenInMinutes = $drivingTime+$walkingTime;
         $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
         $statusTrain = $times[2];
 
-        $value1 = "Dear Mrs Pikisso. ETA $timeHome";
-        $value2 = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
+        $values[1] = "Dear Mrs Pikisso. ETA $timeHome";
+        $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
-        $url = $this->constructUrl([$value1, $value2]);
-        dd($url);
-
-        $this->client->get($url);
+        $hook = new LinkHook('I', ['values' => $values]);
+        return $hook->jsonResponse;
 
     }
 
-    private function constructUrl($values)
-    {
-
-        // FINAL ASSIGN
-
-        $signature = " Your Smart Home";
-        $value1 = $values[0];
-        $value2 = $values[1];
-        $value2 .= $signature;
-        $trigger_url = $this->base_url . "value1=$value1";
-        if ($value2) $trigger_url .= "&value2=$value2";
-        $trigger_url .= $signature;
-
-        return $trigger_url;
-
-    }
-
-
-    private function debug($url, $line_one, $line_two)
-    {
-
-        if ($_GET["action"] == "sms") {
-            $prefix = "<strong>SMS to 07482428982</strong>:<br>";
-            $line_one .= "<br>";
-        } else if ($_GET["action"] == "notification") {
-            $prefix = "IFTTT Notification:<br>";
-            $line_one = "<br><strong>" . $line_one . "</strong><br>";
-        }
-
-        $url = "URL : $url <br><br>";
-
-        echo $url . $prefix . $line_one . $line_two;
-        die();
-
-    }
 
     private function process_response($data)
     {
@@ -145,11 +105,12 @@ class LinkHookController extends Controller
         //[4] traffic conditions
     }
 
-    private function nationalRailSpecificTrain($mainResponse, $n, $departingStn, $arrivalStn)
+    private function nationalRailSpecificTrain($detailedUrl, $departingStn, $arrivalStn)
     {
 
-        $detailedUrl = $mainResponse->departures->all[$n]->service_timetable->id;
-        $data = $this->apiObjectResponse($detailedUrl);
+        $hook = new LinkHook("Z", ['url' => $detailedUrl]);
+        $data = $hook->objectResponse;
+
         $result = [];
         foreach ($data->stops as $stop) {
 
@@ -197,12 +158,16 @@ class LinkHookController extends Controller
 
     private function nationalRailStationLive($departingStn, $arrivalStn)
     {
-        return $this->apiObjectResponse("https://transportapi.com/v3/uk/train/station/$departingStn/live.json?app_id=429b0914&app_key=11628415a6ae399d6b46ea2c4511f074&calling_at=$arrivalStn&darwin=true&train_status=passenger");
+        $hook = new LinkHook('R', ['from' => $departingStn, 'to' => $arrivalStn]);
+
+        return $hook->objectResponse;
     }
 
     private function googleDrivingTime($from, $to)
     {
-        $response = $this->apiObjectResponse("https://maps.googleapis.com/maps/api/directions/json?origin=$from&destination=$to&departure_time=now&language=en&key=AIzaSyCT2G-01NRshhoFDT4GLInBTiIlvra5fIk");
+        $hook = new LinkHook('G', ['from' => $from, 'to' => $to]);
+        $response = $hook->objectResponse;
+
         $duration = $response->routes[0]->legs[0]->duration->value;
         $duration_in_traffic = $response->routes[0]->legs[0]->duration_in_traffic->value;
         $ratio = (($duration_in_traffic - $duration) / $duration) * 100;
@@ -211,6 +176,7 @@ class LinkHookController extends Controller
         $round_mins = round($in_minutes, 0);
         $round_mins_in_traffic = round($in_minutes_in_traffic, 0);
         $round_ratio = round($ratio);
+
         return [$round_mins, $round_mins_in_traffic, $round_ratio];
     }
 
@@ -226,26 +192,24 @@ class LinkHookController extends Controller
         else $drivingCondition = "ok";
 
         return $drivingCondition;
-
     }
 
     private function get_weather_in_maidstone()
     {
 
-
         // fetch Aeris API output as a string and decode into an object
-        $response = file_get_contents("https://api.aerisapi.com/observations/maidstone, uk?&format=json&filter=allstations&limit=1&fields=ob.tempC,ob.weather,ob.feelslikeC&client_id=x2iSePGhU7SK1jkEMCxbK&client_secret=nyEnPsCchakT5uCC7LkhwvO2YyWuU9kCcZkZdXs6");
-        $json = json_decode($response);
-        if ($json->success == true) {
+        $hook = new LinkHook ("W", ['city' => 'maidstone, uk']);
+        $weather = $hook->objectResponse;
 
-            $degrees = $json->response->ob->tempC;
-            $feels = $json->response->ob->feelslikeC;
-            $description = $json->response->ob->weather;
+        if ($weather->success == true) {
+
+            $degrees = $weather->response->ob->tempC;
+            $feels = $weather->response->ob->feelslikeC;
+            $description = $weather->response->ob->weather;
 
             return "The weather in Maidstone is $description. $degrees*C (feels like $feels*C)";
-        } else {
-            return "There was an error getting the weather";
-        }
+
+        } else return "There was an error getting the weather";
 
     }
 
@@ -388,7 +352,7 @@ class LinkHookController extends Controller
 
     $signature = " Your Smart Home";
     $value .= $signature;
-    $trigger_url = $base_url . "value1=$value1";
+    $trigger_url = $baseUrl . "value1=$value1";
     if ($value2) $trigger_url .= "&value2=$value2";
     if ($value3) $trigger_url .= "&value3=$value3";
 
