@@ -10,14 +10,43 @@ class LinkHookController extends Controller
     public $action;
     public $hook;
     public $code;
+    public $debug;
+    public $curfew;
     public $client;
 
     /**
      * LinkHookController constructor.
      * @param $ifttt
      */
-    public function __construct()
+    public function __construct($action = null, $hook = null)
     {
+        $this->debug = false;
+
+        if (isset($action)) {
+
+            $this->action = $action;
+
+            switch ($action) {
+                case "debug":
+                    $this->debug = true;
+                    break;
+            }
+
+        }
+
+        if (isset($hook)) {
+
+            $this->hook = $hook;
+
+            switch ($hook) {
+                case "WE":
+                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Wed', 'Sat', 'Sun']);
+                    $this->waterlooEast();
+                    break;
+
+            }
+
+        }
 
     }
 
@@ -29,9 +58,26 @@ class LinkHookController extends Controller
         echo "Link system active";
     }
 
-    public function waterlooEast($ifttt)
+    public function dieOfCurfew($time, $days)
     {
-        //$this->dieIfOutsideHours([14, 22], ["Wed", "Sat", "Sun"]);
+        if (!$this->debug) {
+            $timeNow = date("H");
+            $dayNow = date("D");
+
+            if ($timeNow < $time[0] || $timeNow > $time[1]) {
+                abort(403, "Outside working hours");
+            }
+
+            foreach ($days as $day) {
+                if ($day == $dayNow) {
+                    abort(403, "Outside working days");
+                }
+            }
+        }
+    }
+
+    public function waterlooEast()
+    {
 
         try {
             $departingStn = "LBG";
@@ -62,7 +108,7 @@ class LinkHookController extends Controller
         $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
         try {
-        $hook = new LinkHook('I', ['values' => $values, 'action' => $ifttt]);
+        $hook = new LinkHook('I', ['values' => $values, 'action' => $this->action]);
         return $hook->fullResponse;
         } catch (\Exception $e) {
             abort ('500', "Error passing information to IFTTT");
@@ -222,27 +268,6 @@ class LinkHookController extends Controller
 
     }
 
-    private function dieIfOutsideHours($time, $days)
-    {
-
-        if ($this->code !=7501) {
-            //echo "test run, ignoring outside hours<br>";
-        } else {
-            $timeNow = date("H");
-            $dayNow = date("D");
-
-            if ($timeNow < $time[0] || $timeNow > $time[1]) {
-                abort(403, "Outside working hours");
-            }
-
-            foreach ($days as $day) {
-                if ($day == $dayNow) {
-                    abort(403, "Outside working days");
-                }
-            }
-        }
-
-    }
 
 //////
 ///
