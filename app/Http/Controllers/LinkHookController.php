@@ -11,10 +11,6 @@ class LinkHookController extends Controller
     public $hook;
     public $code;
     public $client;
-    public $googleApiUrl;
-    public $weatherApiUrl;
-    public $railApiUrl;
-    private $iftttApiUrl;
 
     /**
      * LinkHookController constructor.
@@ -35,7 +31,6 @@ class LinkHookController extends Controller
 
     public function waterlooEast($ifttt)
     {
-        $this->action = $ifttt;
         //$this->dieIfOutsideHours([14, 22], ["Wed", "Sat", "Sun"]);
 
         try {
@@ -67,7 +62,7 @@ class LinkHookController extends Controller
         $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
         try {
-        $hook = new LinkHook('I', ['values' => $values]);
+        $hook = new LinkHook('I', ['values' => $values, 'action' => $ifttt]);
         return $hook->fullResponse;
         } catch (\Exception $e) {
             abort ('500', "Error passing information to IFTTT");

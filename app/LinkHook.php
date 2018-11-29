@@ -81,8 +81,8 @@ class LinkHook extends BaseModel
         $url = str_replace('API_ACTION', $action, $url);
 
         $signature = " Your Smart Home";
-        $value1 = $values[0];
-        $value2 = $values[1];
+        $value1 = $values[1];
+        $value2 = $values[2];
         $value2 .= $signature;
 
         $url = str_replace('API_VALUE_1', $value1, $url);
@@ -116,9 +116,9 @@ class LinkHook extends BaseModel
 
     public function constructRailUrl($from, $to)
     {
-        $baseUrl = env('LINK_SYSTEM_NATIONAL_URL_STATION', '');
-        $key = env('LINK_SYSTEM_NATIONAL_KEY', '');
-        $id = env('LINK_SYSTEM_NATIONAL_ID', '');
+        $baseUrl = env('LINK_SYSTEM_NATIONAL_RAIL_URL', '');
+        $key = env('LINK_SYSTEM_NATIONAL_RAIL_KEY', '');
+        $id = env('LINK_SYSTEM_NATIONAL_RAIL_ID', '');
         $url = str_replace('API_KEY', $key, $baseUrl);
         $url = str_replace('API_ID', $id, $url);
 
