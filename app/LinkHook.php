@@ -75,8 +75,8 @@ class LinkHook extends BaseModel
 
     public function constructIftttUrl($values, $action)
     {
-        $baseUrl = config('LINK_SYSTEM_IFTTT_URL');
-        $key = config('LINK_SYSTEM_IFTTT_KEY');
+        $baseUrl = env('LINK_SYSTEM_IFTTT_URL', '');
+        $key = env('LINK_SYSTEM_IFTTT_KEY', '');
         $url = str_replace('API_KEY', $key, $baseUrl);
         $url = str_replace('API_ACTION', $action, $url);
 
@@ -93,8 +93,8 @@ class LinkHook extends BaseModel
 
     public function constructGoogleUrl($from, $to)
     {
-        $baseUrl = config('LINK_SYSTEM_GOOGLE_MAPS_URL');
-        $key = config('LINK_SYSTEM_GOOGLE_MAPS_KEY');
+        $baseUrl = env('LINK_SYSTEM_GOOGLE_MAPS_URL', '');
+        $key = env('LINK_SYSTEM_GOOGLE_MAPS_KEY', '');
         $url = str_replace('API_KEY', $key, $baseUrl);
 
         $url = str_replace('API_TO', $to, $url);
@@ -105,8 +105,8 @@ class LinkHook extends BaseModel
 
     public function constructWeatherUrl($city)
     {
-        $baseUrl = config('LINK_SYSTEM_WEATHER_URL');
-        $key = config('LINK_SYSTEM_WEATHER_KEY');
+        $baseUrl = env('LINK_SYSTEM_WEATHER_URL', '');
+        $key = env('LINK_SYSTEM_WEATHER_KEY', '');
         $url = str_replace('API_KEY', $key, $baseUrl);
 
         $url = str_replace('API_CITY', $city, $url);
@@ -116,9 +116,9 @@ class LinkHook extends BaseModel
 
     public function constructRailUrl($from, $to)
     {
-        $baseUrl = config('LINK_SYSTEM_NATIONAL_URL_STATION');
-        $key = config('LINK_SYSTEM_NATIONAL_KEY');
-        $id = config('LINK_SYSTEM_NATIONAL_ID');
+        $baseUrl = env('LINK_SYSTEM_NATIONAL_URL_STATION', '');
+        $key = env('LINK_SYSTEM_NATIONAL_KEY', '');
+        $id = env('LINK_SYSTEM_NATIONAL_ID', '');
         $url = str_replace('API_KEY', $key, $baseUrl);
         $url = str_replace('API_ID', $id, $url);
 
