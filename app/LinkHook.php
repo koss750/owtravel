@@ -14,7 +14,7 @@ class LinkHook extends BaseModel
 {
     public $url;
     public $objectResponse;
-    public $jsonResponse;
+    public $fullResponse;
     public $client;
 
     public function __construct($type, $params)
@@ -65,8 +65,8 @@ class LinkHook extends BaseModel
         }
 
         try {
-            $this->jsonResponse = $response->getBody()->getContents();
-            $this->objectResponse = json_decode($this->jsonResponse);
+            $this->fullResponse = $response->getBody()->getContents();
+            $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
             abort (500, "Could not process response from hook");
         }

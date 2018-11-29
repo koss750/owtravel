@@ -38,16 +38,26 @@ class LinkHookController extends Controller
         $this->action = $ifttt;
         //$this->dieIfOutsideHours([14, 22], ["Wed", "Sat", "Sun"]);
 
-        $departingStn = "LBG";
-        $arrivalStn = "MRN";
-        $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
+        try {
+            $departingStn = "LBG";
+            $arrivalStn = "MRN";
+            $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
+        } catch (\Exception $e) {
+            abort('500', "Error getting information from Google");
+        }
+
         $drivingTime = $drivingTimes[1];
         $trafficRatio = $drivingTimes[2];
         $drivingCondition = $this->trafficCondition($trafficRatio);
         $walkingTime = 5;
 
+        try {
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
         $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
+        } catch (\Exception $e) {
+            abort('500', "Error getting information from Darwin");
+        }
+
         $timeMarden = $times[0];
         $timeAfterMardenInMinutes = $drivingTime+$walkingTime;
         $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
@@ -56,8 +66,12 @@ class LinkHookController extends Controller
         $values[1] = "Dear Mrs Pikisso. ETA $timeHome";
         $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
+        try {
         $hook = new LinkHook('I', ['values' => $values]);
-        return $hook->jsonResponse;
+        return $hook->fullResponse;
+        } catch (\Exception $e) {
+            abort ('500', "Error passing information to IFTTT");
+        }
 
     }
 
