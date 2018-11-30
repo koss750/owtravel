@@ -39,5 +39,6 @@ Route::middleware('auth:api')->get('/tests', function (Request $request) {
 
 Route::group(['prefix' => 'link'], function () {
     Route::get('status', 'LinkHookController@index');
-    Route::get('waterloo/{ifttt}', 'LinkHookController@waterlooEast');
+    Route::get('{action}/{hook}', 'LinkHookController@waterlooEast');
+    Route::get('{action}/{hook}', 'LinkHookController@waterlooEast');
 });
