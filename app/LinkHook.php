@@ -50,8 +50,14 @@ class LinkHook extends BaseModel
         }
 
         try {
-            $this->fullResponse = $response->getBody()->getContents();
-            $this->objectResponse = json_decode($this->fullResponse);
+            if ($this->params["API_ACTION"=="debug"]) {
+                unset ($this->params["API_ACTION"]);
+                $this->fullResponse=$this->params;
+            }
+            else {
+                $this->fullResponse = $response->getBody()->getContents();
+                $this->objectResponse = json_decode($this->fullResponse);
+            }
         } catch (\Exception $e) {
             abort (500, "Could not process response from hook");
         }
