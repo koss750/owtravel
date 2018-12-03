@@ -23,11 +23,12 @@ class LinkHook extends BaseModel
     public function __construct($type, $params)
     {
         $this->client = new GuzzleHttp\Client();
-        $this->config = config('app.link_system');
         $this->type = $type;
+        $this->config = config('app.link_system');
+        $this->config = $this->config[$this->type];
         $this->params = $params;
 
-        $this->url = $this->config[$type]["url"] ?? $this->params["url"] ?? abort(500, "URL cannot be established for the LinkHook of type $type");
+        $this->url = $this->config["url"] ?? $this->params["url"] ?? abort(500, "URL cannot be established for the LinkHook of type $type");
 
         $this->processMe();
     }
@@ -40,7 +41,9 @@ class LinkHook extends BaseModel
 
         try {
             $this->insertParam();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            abort (500, "Could not insert params");
+        }
 
         try {
             $response = $this->client->get($this->url);
@@ -59,7 +62,7 @@ class LinkHook extends BaseModel
 
     public function insertParams() {
 
-        $typeSpecificParams = $this->config[$this->type]["params"];
+        $typeSpecificParams = $this->config["params"];
         foreach ($typeSpecificParams as $specificParam) {
             $this->url = str_replace($specificParam, $this->params[$specificParam], $this->url);
         }

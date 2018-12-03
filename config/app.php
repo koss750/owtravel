@@ -20,6 +20,10 @@ foreach ($apiArray as $item) {
         'params' => $params
         ];
 }
+$link_vars["GENERAL"] = [
+    "url" => NULL,
+    "params" => NULL
+];
 
 return [
 

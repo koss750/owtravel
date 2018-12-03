@@ -174,7 +174,7 @@ class LinkHookController extends Controller
     private function nationalRailSpecificTrain($detailedUrl, $departingStn, $arrivalStn)
     {
 
-        $hook = new LinkHook("Z", ['url' => $detailedUrl]);
+        $hook = new LinkHook("GENERAL", ['url' => $detailedUrl]);
         $data = $hook->objectResponse;
 
         $result = [];
