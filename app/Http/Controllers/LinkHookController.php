@@ -126,7 +126,7 @@ class LinkHookController extends Controller
         ];
 
         try {
-            $hook = new LinkHook('IFTTT', ['params' => $params]);
+            $hook = new LinkHook('IFTTT', $params);
             return $hook->fullResponse;
         } catch (\Exception $e) {
             abort('500', "Error passing information to IFTTT");

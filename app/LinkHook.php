@@ -61,8 +61,8 @@ class LinkHook extends BaseModel
     public function insertParams() {
 
         $typeSpecificParams = $this->config["params"];
-        foreach ($typeSpecificParams as $specificParam) {
-            $this->url = str_replace($specificParam, $this->params[$specificParam], $this->url);
+        foreach ($typeSpecificParams as $item) {
+            $this->url = str_replace($item, $this->params[$item], $this->url);
         }
 
     }
