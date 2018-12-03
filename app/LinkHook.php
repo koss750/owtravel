@@ -39,14 +39,14 @@ class LinkHook extends BaseModel
         }
 
         try {
+            $this->insertParam();
+        } catch (\Exception $e) {}
+
+        try {
             $response = $this->client->get($this->url);
         } catch (\Exception $e) {
             abort (500, "Could not process hook");
         }
-
-        try {
-            $this->insertParam();
-        } catch (\Exception $e) {}
 
         try {
             $this->fullResponse = $response->getBody()->getContents();
