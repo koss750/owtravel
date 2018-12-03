@@ -120,12 +120,13 @@ class LinkHookController extends Controller
         $statusTrain = $times[2];
 
         $params = [
+            "API_ACTION" => $this->action,
             "API_VAR1" => "Good evening! ETA $timeHome",
             "API_VAR2" => "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition. Have a wonderful evening."
         ];
 
         try {
-            $hook = new LinkHook('IFTTT', ['params' => $params, 'action' => $this->action]);
+            $hook = new LinkHook('IFTTT', ['params' => $params]);
             return $hook->fullResponse;
         } catch (\Exception $e) {
             abort('500', "Error passing information to IFTTT");

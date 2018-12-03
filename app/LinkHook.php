@@ -40,10 +40,8 @@ class LinkHook extends BaseModel
         }
 
         try {
-            $this->insertParam();
-        } catch (\Exception $e) {
-            abort (500, "Could not insert params");
-        }
+            $this->insertParams();
+        } catch (\Exception $e) {}
 
         try {
             $response = $this->client->get($this->url);
