@@ -12,10 +12,8 @@ foreach ($apiArray as $item) {
     foreach ($apiKeyVars as $apiKeyVar) {
         $apiKeyEnv = $linkPrefix . $item . "_$apiKeyVar";
         $apiUrl = str_replace("$apiKeyVar", env($apiKeyEnv), $apiUrl);
-        array_push($link_vars, [
-           $apiName => $apiUrl
-        ]);
     }
+    $link_vars[$apiName] = $apiUrl;
 }
 
 return [
