@@ -119,11 +119,13 @@ class LinkHookController extends Controller
         $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
         $statusTrain = $times[2];
 
-        $values[1] = "Dear Mrs Pikisso. ETA $timeHome";
-        $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
+        $params = [
+            "API_VAR1" => "Good evening! ETA $timeHome",
+            "API_VAR2" => "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition. Have a wonderful evening."
+        ];
 
         try {
-            $hook = new LinkHook('I', ['values' => $values, 'action' => $this->action]);
+            $hook = new LinkHook('IFTTT', ['params' => $params, 'action' => $this->action]);
             return $hook->fullResponse;
         } catch (\Exception $e) {
             abort('500', "Error passing information to IFTTT");
@@ -133,7 +135,7 @@ class LinkHookController extends Controller
 
     private function googleDrivingTime($from, $to)
     {
-        $hook = new LinkHook('G', ['from' => $from, 'to' => $to]);
+        $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to]);
         $response = $hook->objectResponse;
 
         $duration = $response->routes[0]->legs[0]->duration->value;
@@ -164,7 +166,7 @@ class LinkHookController extends Controller
 
     private function nationalRailStationLive($departingStn, $arrivalStn)
     {
-        $hook = new LinkHook('R', ['from' => $departingStn, 'to' => $arrivalStn]);
+        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn]);
 
         return $hook->objectResponse;
     }
