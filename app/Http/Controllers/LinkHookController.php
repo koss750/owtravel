@@ -14,13 +14,8 @@ class LinkHookController extends Controller
     public $curfew;
     public $client;
 
-    /**
-     * LinkHookController constructor.
-     * @param $ifttt
-     */
-    public function __construct($action = null, $hook = null)
-    {
-        $this->debug = false;
+
+    public function index($action, $hook) {
 
         if (isset($action)) {
 
@@ -47,19 +42,19 @@ class LinkHookController extends Controller
             switch ($hook) {
                 case "WE":
                     if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Wed', 'Sat', 'Sun'], []);
-                    $this->waterlooEast();
+                    return $this->waterlooEast();
                     break;
                 case "PW":
                     if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Wed', 'Sat', 'Sun'], []);
-                    $this->paddockWood();
+                    return $this->paddockWood();
                     break;
                 case "WU":
                     if (!$this->debug) $this->dieOfCurfew(['6', '12'], ['Wed', 'Sat', 'Sun'], ['text']);
-                    $this->wakeUp();
+                    return $this->wakeUp();
                     break;
                 case "LC":
                     if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
-                    $this->lizzieCommute();
+                    return $this->lizzieCommute();
                     break;
             }
 
@@ -127,6 +122,7 @@ class LinkHookController extends Controller
 
         if ($this->debug) {
             var_dump($params);
+            die();
         } else {
             try {
                 $hook = new LinkHook('IFTTT', $params);
@@ -230,9 +226,9 @@ class LinkHookController extends Controller
     /**
      * @return array
      */
-    public function index()
+    public function active()
     {
-        echo "Link system active";
+        echo "Link system available to use";
     }
 
     public function paddockWood()

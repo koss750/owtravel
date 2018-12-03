@@ -38,7 +38,6 @@ Route::middleware('auth:api')->get('/tests', function (Request $request) {
 //LINK system routes
 
 Route::group(['prefix' => 'link'], function () {
-    Route::get('status', 'LinkHookController@index');
-    Route::get('{action}/{hook}', 'LinkHookController@waterlooEast');
-    Route::get('{action}/{hook}', 'LinkHookController@waterlooEast');
+    Route::get('status', 'LinkHookController@active');
+    Route::get('{action}/{hook}', 'LinkHookController@index');
 });
