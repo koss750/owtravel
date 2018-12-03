@@ -50,7 +50,7 @@ class LinkHook extends BaseModel
         }
 
         try {
-            if ($this->params["API_ACTION"=="debug"]) {
+            if ($this->params["API_ACTION"]=="debug") {
                 unset ($this->params["API_ACTION"]);
                 $this->fullResponse=$this->params;
             }
