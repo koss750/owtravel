@@ -13,7 +13,7 @@ foreach ($apiArray as $item) {
         $apiKeyEnv = $linkPrefix . $item . "_$apiKeyVar";
         $apiUrl = str_replace("$apiKeyVar", env($apiKeyEnv), $apiUrl);
     }
-    $paramEnv = $linkPrefix . $item . "_KEYS";
+    $paramEnv = $linkPrefix . $item . "_VARS";
     $params = explode(",", env($paramEnv));
     $link_vars[$apiName] = [
         'url' => $apiUrl,
@@ -24,6 +24,8 @@ $link_vars["GENERAL"] = [
     "url" => NULL,
     "params" => NULL
 ];
+
+
 
 return [
 

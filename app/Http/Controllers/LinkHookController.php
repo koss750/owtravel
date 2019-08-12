@@ -41,15 +41,15 @@ class LinkHookController extends Controller
 
             switch ($hook) {
                 case "WE":
-                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Wed', 'Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
                     return $this->waterlooEast();
                     break;
                 case "PW":
-                    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Wed', 'Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun'], []);
                     return $this->paddockWood();
                     break;
-                case "WU":
-                    if (!$this->debug) $this->dieOfCurfew(['6', '12'], ['Wed', 'Sat', 'Sun'], ['text']);
+                case "wu":
+                    if (!$this->debug) $this->dieOfCurfew(['6', '12'], ['Sat', 'Sun'], ['text']);
                     return $this->wakeUp();
                     break;
                 case "LC":
@@ -94,6 +94,7 @@ class LinkHookController extends Controller
             $arrivalStn = "MRN";
             $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
         } catch (\Exception $e) {
+            var_dump ($e);
             abort('500', "Error getting information from Google");
         }
 
@@ -132,8 +133,7 @@ class LinkHookController extends Controller
     private function googleDrivingTime($from, $to)
     {
         $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to]);
-        $response = $hook->objectResponse;
-
+        $response = json_decode($hook->fullResponse);
         $duration = $response->routes[0]->legs[0]->duration->value;
         $duration_in_traffic = $response->routes[0]->legs[0]->duration_in_traffic->value;
         $ratio = (($duration_in_traffic - $duration) / $duration) * 100;
@@ -164,7 +164,7 @@ class LinkHookController extends Controller
     {
         $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn]);
 
-        return $hook->objectResponse;
+        return $hook->fullResponse;
     }
 
     private function nationalRailSpecificTrain($detailedUrl, $departingStn, $arrivalStn)
@@ -234,9 +234,9 @@ class LinkHookController extends Controller
     public function wakeUp()
     {
         try {
-            $departingStn = "MRN";
-            $arrivalStn = "LBG";
-            $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
+            $departingStn = "SFA";
+            $arrivalStn = "EBD";
+            $drivingTimes = $this->googleDrivingTime("ebbsfleet+station", "51.231953,0.504038");
         } catch (\Exception $e) {
             abort('500', "Error getting information from Google");
         }
@@ -248,6 +248,7 @@ class LinkHookController extends Controller
 
         try {
             $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
+            $mainResponse = json_decode($mainResponse);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         } catch (\Exception $e) {
             abort('500', "Error getting information from Darwin");
@@ -258,13 +259,14 @@ class LinkHookController extends Controller
         $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
         $statusTrain = $times[2];
 
-        $values[1] = "Dear Mrs Pikisso. ETA $timeHome";
-        $values[2] = "Koss is en route home and is now around Waterloo East. Train is $statusTrain due to arrive to Marden at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
+        $values[1] = "Good evening! ETA $timeHome";
+        $values[2] = "Koss is en route home and has just left St Pancras. Train is $statusTrain due to arrive to Ebbsfleet at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
         try {
             $hook = new LinkHook('I', ['values' => $values, 'action' => $this->action]);
             return $hook->fullResponse;
         } catch (\Exception $e) {
+            dd($values);
             abort('500', "Error passing information to IFTTT");
         }
 

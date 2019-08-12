@@ -29,7 +29,6 @@ class LinkHook extends BaseModel
         $this->params = $params;
 
         $this->url = $this->config["url"] ?? $this->params["url"] ?? abort(500, "URL cannot be established for the LinkHook of type $type");
-
         $this->processMe();
     }
 
@@ -42,7 +41,6 @@ class LinkHook extends BaseModel
         try {
             $this->insertParams();
         } catch (\Exception $e) {}
-
         try {
             $response = $this->client->get($this->url);
         } catch (\Exception $e) {
@@ -50,14 +48,8 @@ class LinkHook extends BaseModel
         }
 
         try {
-            if ($this->params["API_ACTION"]=="debug") {
-                unset ($this->params["API_ACTION"]);
-                $this->fullResponse=$this->params;
-            }
-            else {
-                $this->fullResponse = $response->getBody()->getContents();
-                $this->objectResponse = json_decode($this->fullResponse);
-            }
+            $this->fullResponse = $response->getBody()->getContents();
+            $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
             abort (500, "Could not process response from hook");
         }
