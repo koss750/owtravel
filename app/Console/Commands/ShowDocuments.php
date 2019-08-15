@@ -2,24 +2,26 @@
 
 namespace App\Console\Commands;
 
+use App\Document;
 use App\TravelProgramme;
+use App\User;
 use Illuminate\Console\Command;
 
-class ShowProgrammes extends Command
+class ShowDocuments extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'show:programmes';
+    protected $signature = 'show:docs';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Shows travel programmmes recorded';
+    protected $description = 'Shows docs for a particular user';
 
     /**
      * Create a new command instance.
@@ -38,19 +40,21 @@ class ShowProgrammes extends Command
      */
     public function handle()
     {
-        $programmes = TravelProgramme::all()->sortBy('start_date');
-        $headers = ['Title', 'Destination'];
+        $userQuery = $this->ask('Full name of the user');
 
 
+        $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
 
+        $docs = Document::where('user_id', $user->id)->get();
         $data = array();
+        $headers = ['Document', 'Number'];
 
-        foreach ($programmes as $programme) {
+        foreach ($docs as $doc) {
 
             $data[] =
                 [
-                    'Title' => $programme->name,
-                    'Destination' => $programme->main_destination,
+                    'Document' => $doc->description,
+                    'Number' => $doc->number,
                 ];
 
         }
