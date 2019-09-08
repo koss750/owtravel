@@ -3,11 +3,10 @@
 namespace App\Console\Commands;
 
 use App\BankCard;
-use App\TravelProgramme;
 use App\User;
 use Illuminate\Console\Command;
 
-class ShowProgrammes extends Command
+class ShowBankCards extends Command
 {
     /**
      * The name and signature of the console command.
