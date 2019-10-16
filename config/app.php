@@ -1,5 +1,32 @@
 <?php
 
+$link_vars= array();
+$linkPrefix = "LINK_SYSTEM_";
+$apiArray = explode(",", env('LINK_SYSTEM_APIS'));
+foreach ($apiArray as $item) {
+    $apiName = $item;
+    $apiUrlEnv = $linkPrefix . $item . "_URL";
+    $apiUrl = env($apiUrlEnv);
+    $apiKeyVarsEnv = $linkPrefix . $item . "_KEY_VARS";
+    $apiKeyVars = explode(",", env($apiKeyVarsEnv));
+    foreach ($apiKeyVars as $apiKeyVar) {
+        $apiKeyEnv = $linkPrefix . $item . "_$apiKeyVar";
+        $apiUrl = str_replace("$apiKeyVar", env($apiKeyEnv), $apiUrl);
+    }
+    $paramEnv = $linkPrefix . $item . "_VARS";
+    $params = explode(",", env($paramEnv));
+    $link_vars[$apiName] = [
+        'url' => $apiUrl,
+        'params' => $params
+        ];
+}
+$link_vars["GENERAL"] = [
+    "url" => NULL,
+    "params" => NULL
+];
+
+
+
 return [
 
     /*
@@ -107,6 +134,19 @@ return [
     'key' => env('APP_KEY'),
 
     'cipher' => 'AES-256-CBC',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Link System 3rd party APIs, keys and settings
+    |--------------------------------------------------------------------------
+    |
+    | The service providers listed here will be automatically loaded on the
+    | request to your application. Feel free to add your own services to
+    | this array to grant expanded functionality to your applications.
+    |
+    */
+
+    'link_system' => $link_vars,
 
     /*
     |--------------------------------------------------------------------------
