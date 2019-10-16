@@ -18,16 +18,17 @@ class LinkHook extends BaseModel
     public $fullResponse;
     public $client;
     public $params;
+    public $debug;
     public $config;
 
-    public function __construct($type, $params)
+    public function __construct($type, $params, $debug = false)
     {
         $this->client = new GuzzleHttp\Client();
         $this->type = $type;
         $this->config = config('app.link_system');
         $this->config = $this->config[$this->type];
         $this->params = $params;
-
+        $this->debug = $debug;
         $this->url = $this->config["url"] ?? $this->params["url"] ?? abort(500, "URL cannot be established for the LinkHook of type $type");
         $this->processMe();
     }
@@ -40,6 +41,7 @@ class LinkHook extends BaseModel
 
         try {
             $this->insertParams();
+            if ($this->debug) echo ($this->url . "<br>");
         } catch (\Exception $e) {
             abort (500, "Could not process hook");
         }

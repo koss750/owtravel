@@ -132,7 +132,7 @@ class LinkHookController extends Controller
 
     private function googleDrivingTime($from, $to)
     {
-        $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to]);
+        $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to], $this->debug);
         $response = json_decode($hook->fullResponse);
         $duration = $response->routes[0]->legs[0]->duration->value;
         $duration_in_traffic = $response->routes[0]->legs[0]->duration_in_traffic->value;
