@@ -40,19 +40,19 @@ class LinkHookController extends Controller
             $this->hook = $hook;
 
             switch ($hook) {
-                case "WE":
+                case "we":
                     if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
                     return $this->waterlooEast();
                     break;
-                case "PW":
+                case "pw":
                     if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun'], []);
                     return $this->paddockWood();
                     break;
                 case "wu":
-                    if (!$this->debug) $this->dieOfCurfew(['6', '12'], ['Sat', 'Sun'], ['text']);
+                    if (!$this->debug) $this->dieOfCurfew(['6', '23'], ['Sat', 'Sun'], ['text']);
                     return $this->wakeUp();
                     break;
-                case "LC":
+                case "lc":
                     if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
                     return $this->lizzieCommute();
                     break;
@@ -104,7 +104,7 @@ class LinkHookController extends Controller
         $walkingTime = 5;
 
         try {
-            $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
+            $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, $drivingTime);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         } catch (\Exception $e) {
             abort('500', "Error getting information from Darwin");
@@ -160,10 +160,9 @@ class LinkHookController extends Controller
         return $drivingCondition;
     }
 
-    private function nationalRailStationLive($departingStn, $arrivalStn)
+    private function nationalRailStationLive($departingStn, $arrivalStn, $offset)
     {
-        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn]);
-
+        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset]);
         return $hook->fullResponse;
     }
 
@@ -234,20 +233,21 @@ class LinkHookController extends Controller
     public function wakeUp()
     {
         try {
-            $departingStn = "SFA";
-            $arrivalStn = "EBD";
-            $drivingTimes = $this->googleDrivingTime("ebbsfleet+station", "51.231953,0.504038");
+            $drivingTimes = $this->googleDrivingTime("51.231953,0.504038", "ebbsfleet+station");
+            $departingStn = "EBD";
+            $arrivalStn = "SFA";
         } catch (\Exception $e) {
-            abort('500', "Error getting information from Google");
+            abort('500', $e);
         }
 
         $drivingTime = $drivingTimes[1];
         $trafficRatio = $drivingTimes[2];
         $drivingCondition = $this->trafficCondition($trafficRatio);
         $walkingTime = 5;
+        $offsetTime = $drivingTime+$walkingTime;
 
         try {
-            $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn);
+            $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, $offsetTime);
             $mainResponse = json_decode($mainResponse);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         } catch (\Exception $e) {
