@@ -20,10 +20,6 @@ foreach ($apiArray as $item) {
         'params' => $params
         ];
 }
-$link_vars["GENERAL"] = [
-    "url" => NULL,
-    "params" => NULL
-];
 
 
 
@@ -147,6 +143,7 @@ return [
     */
 
     'link_system' => $link_vars,
+    'home_address' => env('HOME_ADDRESS_FOR_GOOGLE'),
 
     /*
     |--------------------------------------------------------------------------

@@ -36,27 +36,33 @@ class LinkHook extends BaseModel
     public function processMe() {
 
         if (!isset($this->url)) {
-            abort (500, "Hook Url Not Set");
+            if ($this->debug) echo "500, Hook Url Not Set";
+            else abort (500, "Hook Url Not Set");
         }
 
         try {
-            echo "inserting params for $this->type";
+            if ($this->debug) echo "inserting params for $this->type <br>";
             $this->insertParams();
             if ($this->debug) echo ($this->url . "<br>");
         } catch (\Exception $e) {
-            abort (500, "Could not process hook");
+            if ($this->debug) echo "500, Failed inserting params into hook url. $e";
+            else abort (500, "Failed inserting params into hook url");
         }
+
+
         try {
             $response = $this->client->get($this->url);
         } catch (\Exception $e) {
-            abort (500, "Could not process hook");
+            if ($this->debug) echo "500, Could not get response from hook $e";
+            else abort (500, "Could not get response from hook");
         }
 
         try {
             $this->fullResponse = $response->getBody()->getContents();
             $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
-            abort (500, "Could not process response from hook");
+            if ($this->debug) echo "500, Failed while pricessing response from hook $e";
+            else abort (500, "Failed while pricessing response from hook");
         }
 
     }

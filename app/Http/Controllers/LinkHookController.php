@@ -13,6 +13,8 @@ class LinkHookController extends Controller
     public $debug;
     public $curfew;
     public $client;
+    private $lineOne;
+    private $lineTwo;
 
 
     public function index($action, $hook) {
@@ -54,7 +56,7 @@ class LinkHookController extends Controller
                     break;
                 case "lc":
                     if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
-                    return $this->lizzieCommute();
+                    return $this->lizzieMorningCommute();
                     break;
             }
 
@@ -132,10 +134,24 @@ class LinkHookController extends Controller
 
     private function googleDrivingTime($from, $to)
     {
+        $routeOptimization = false;
+
+        if ($from=="home") {
+            $from = "2+Cricketers+way+coxheath";
+            $routeOptimization = true;
+        }
+
         $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to], $this->debug);
         $response = json_decode($hook->fullResponse);
+
         $duration = $response->routes[0]->legs[0]->duration->value;
         $duration_in_traffic = $response->routes[0]->legs[0]->duration_in_traffic->value;
+
+        if (isset ($response->routes[0]->legs[1]->duration->value)) {
+            $duration = $duration + $response->routes[0]->legs[1]->duration->value;
+            $duration_in_traffic = $duration_in_traffic + $response->routes[0]->legs[1]->duration_in_traffic->value;
+        }
+
         $ratio = (($duration_in_traffic - $duration) / $duration) * 100;
         $in_minutes = $duration / 60;
         $in_minutes_in_traffic = $duration / 60;
@@ -143,7 +159,11 @@ class LinkHookController extends Controller
         $round_mins_in_traffic = round($in_minutes_in_traffic, 0);
         $round_ratio = round($ratio);
 
-        return [$round_mins, $round_mins_in_traffic, $round_ratio];
+        if ($routeOptimization) {
+            $turn = $response->routes[0]->legs[0]->steps[2]->maneuver;
+        }
+
+        return [$round_mins, $round_mins_in_traffic, $round_ratio, ($turn ?? null)];
     }
 
     private function trafficCondition($ratio)
@@ -169,7 +189,7 @@ class LinkHookController extends Controller
     private function nationalRailSpecificTrain($service, $departingStn, $arrivalStn)
     {
 
-        $hook = new LinkHook("NATIONAL_RAIL_SPECIFIC", ['API_SERVICE' => $service]);
+        $hook = new LinkHook("BASIC", ['URL' => $service], $this->debug);
         $data = $hook->objectResponse;
 
         $result = [];
@@ -233,20 +253,23 @@ class LinkHookController extends Controller
     public function wakeUp()
     {
         try {
-            $drivingTimes = $this->googleDrivingTime("51.231953,0.504038", "ebbsfleet+station");
-            $departingStn = "EBD";
-            $arrivalStn = "SFA";
+
+            $drivingTimes = $this->googleDrivingTime("home", "ebbsfleet+station");
+            $drivingTime = $drivingTimes[1];
+            $trafficRatio = $drivingTimes[2];
+            $drivingCondition = $this->trafficCondition($trafficRatio);
+
         } catch (\Exception $e) {
             abort('500', $e);
         }
 
-        $drivingTime = $drivingTimes[1];
-        $trafficRatio = $drivingTimes[2];
-        $drivingCondition = $this->trafficCondition($trafficRatio);
+
         $walkingTime = 5;
         $offsetTime = $drivingTime+$walkingTime;
 
         try {
+            $departingStn = "EBD";
+            $arrivalStn = "SFA";
             $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, $offsetTime);
             $mainResponse = json_decode($mainResponse);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
@@ -261,22 +284,62 @@ class LinkHookController extends Controller
         $timeHome = date('H:i', strtotime("$timeMarden + $timeAfterMardenInMinutes minutes"));
         $statusTrain = $times[2];
 
-        $values[1] = "Good evening! ETA $timeHome";
-        $values[2] = "Koss is en route home and has just left St Pancras. Train is $statusTrain due to arrive to Ebbsfleet at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
+        $this->lineOne = "Good evening! ETA $timeHome";
+        $this->lineTwo = "Koss is en route home and has just left St Pancras. Train is $statusTrain due to arrive to Ebbsfleet at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
-        try {
-            $hook = new LinkHook('I', ['values' => $values, 'action' => $this->action]);
-            return $hook->fullResponse;
-        } catch (\Exception $e) {
-            dd($values);
-            abort('500', "Error passing information to IFTTT");
-        }
+        $this->sendToIffft();
 
     }
 
-    public function lizzieCommute()
+    public function lizzieMorningCommute()
     {
+        //fremlin+walk+car+park&waypoints=Dean+street+maidstone
+        $drivingTimes = $this->compareDrivingTimes("home", "fremlin+walk+car+park", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
 
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 11;
+
+        $commuteTime = $walkingTime+$drivingTime+15;
+        $timeNow = now();
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 1 hour"));
+
+        $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
+
+        $this->lineOne = "Good morning. Roads are $drivingCondition.";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave in 15 minutes, you should be at KCC at $arrivalTime. $directions. ";
+
+        $this->sendToIffft(true);
+    }
+
+    public function processHeathRoadTurn($turn, $alternative) {
+
+        if ($turn == "turn-right") {
+            return "Dean Street is faster. If you take Loose Road, it would take $alternative minutes.";
+        }
+        else return "Loose Road is faster. If you take Dean Street, it would take $alternative minutes.";
+
+    }
+
+    public function compareDrivingTimes($from, $to, $via1, $via2) {
+        $to = $to . $via2;
+        $drivingTimes1 = $this->googleDrivingTime($from, $to);
+        $drivingTime1 = $drivingTimes1[1];
+
+        $to = $to . $via1;
+        $drivingTimes2 = $this->googleDrivingTime($from, $to);
+        $drivingTime2 = $drivingTimes2[1];
+
+        if ($drivingTime1<=$drivingTime2) {
+            $drivingTimes1["alternative"] = $drivingTime2;
+            return $drivingTimes1;
+        }
+        else {
+            $drivingTimes2["alternative"] = $drivingTime1;
+            return $drivingTimes2;
+        }
     }
 
     public function weatherMaidstone()
@@ -344,6 +407,31 @@ class LinkHookController extends Controller
 
         } else return "There was an error getting the weather";
 
+    }
+
+    private function sendToIffft($alternative_api = false) {
+
+        if ($this->debug) {
+            $response = "<br> $this->lineOne <br> $this->lineTwo";
+            echo $response;
+            return 0;
+        }
+
+        if ($alternative_api) $api = "IFTTTY";
+        else $api = "IFTTT";
+
+        try {
+            $hook = new LinkHook($api, [
+                'API_VAR1' => $this->lineOne,
+                'API_VAR2' => $this->lineTwo,
+                'API_ACTION' => $this->action
+            ], $this->debug
+            );
+            echo $hook->fullResponse;
+        } catch (\Exception $e) {
+            if ($this->debug) echo "500, Error passing information to IFTTT $e";
+            abort('500', "Error passing information to IFTTT");
+        }
     }
 
 
