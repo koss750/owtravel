@@ -55,7 +55,7 @@ class LinkHookController extends Controller
                     return $this->wakeUp();
                     break;
                 case "lc":
-                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun'], []);
                     return $this->lizzieMorningCommute();
                     break;
             }
@@ -311,7 +311,7 @@ class LinkHookController extends Controller
         $this->lineOne = "Good morning. Roads are $drivingCondition.";
         $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave in 15 minutes, you should be at KCC at $arrivalTime. $directions. ";
 
-        $this->sendToIffft(true);
+        $this->sendToIffft();
     }
 
     public function processHeathRoadTurn($turn, $alternative) {
