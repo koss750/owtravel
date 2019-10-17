@@ -162,14 +162,14 @@ class LinkHookController extends Controller
 
     private function nationalRailStationLive($departingStn, $arrivalStn, $offset)
     {
-        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset]);
+        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset], $this->debug);
         return $hook->fullResponse;
     }
 
-    private function nationalRailSpecificTrain($detailedUrl, $departingStn, $arrivalStn)
+    private function nationalRailSpecificTrain($service, $departingStn, $arrivalStn)
     {
 
-        $hook = new LinkHook("GENERAL", ['url' => $detailedUrl]);
+        $hook = new LinkHook("NATIONAL_RAIL_SPECIFIC", ['API_SERVICE' => $service]);
         $data = $hook->objectResponse;
 
         $result = [];
@@ -251,7 +251,9 @@ class LinkHookController extends Controller
             $mainResponse = json_decode($mainResponse);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         } catch (\Exception $e) {
+            if ($this->debug) echo $e;
             abort('500', "Error getting information from Darwin");
+
         }
 
         $timeMarden = $times[0];

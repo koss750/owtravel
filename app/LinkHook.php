@@ -40,6 +40,7 @@ class LinkHook extends BaseModel
         }
 
         try {
+            echo "inserting params for $this->type";
             $this->insertParams();
             if ($this->debug) echo ($this->url . "<br>");
         } catch (\Exception $e) {
