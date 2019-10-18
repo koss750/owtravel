@@ -43,11 +43,11 @@ class LinkHookController extends Controller
 
             switch ($hook) {
                 case "we":
-                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun']);
                     return $this->waterlooEast();
                     break;
                 case "pw":
-                    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun']);
                     return $this->paddockWood();
                     break;
                 case "wu":
@@ -55,8 +55,12 @@ class LinkHookController extends Controller
                     return $this->wakeUp();
                     break;
                 case "lc":
-                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun'], []);
+                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun']);
                     return $this->lizzieMorningCommute();
+                    break;
+                case "kc":
+                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun']);
+                    return $this->kossMorningCommute();
                     break;
             }
 
@@ -64,7 +68,7 @@ class LinkHookController extends Controller
 
     }
 
-    public function dieOfCurfew($time, $days, $actions)
+    public function dieOfCurfew($time, $days, $actions = [])
     {
         if (!$this->debug) {
             $timeNow = date("H");
@@ -92,20 +96,19 @@ class LinkHookController extends Controller
     {
 
         try {
-            $departingStn = "LBG";
-            $arrivalStn = "MRN";
             $drivingTimes = $this->googleDrivingTime("marden+station", "51.231953,0.504038");
+            $drivingTime = $drivingTimes[1];
+            $trafficRatio = $drivingTimes[2];
+            $drivingCondition = $this->trafficCondition($trafficRatio);
+            $walkingTime = 5;
         } catch (\Exception $e) {
             var_dump ($e);
             abort('500', "Error getting information from Google");
         }
 
-        $drivingTime = $drivingTimes[1];
-        $trafficRatio = $drivingTimes[2];
-        $drivingCondition = $this->trafficCondition($trafficRatio);
-        $walkingTime = 5;
-
         try {
+            $departingStn = "LBG";
+            $arrivalStn = "MRN";
             $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, $drivingTime);
             $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
         } catch (\Exception $e) {
@@ -189,7 +192,7 @@ class LinkHookController extends Controller
     private function nationalRailSpecificTrain($service, $departingStn, $arrivalStn)
     {
 
-        $hook = new LinkHook("BASIC", ['URL' => $service], $this->debug);
+        $hook = new LinkHook("BASIC", ['API_URL' => $service], $this->debug);
         $data = $hook->objectResponse;
 
         $result = [];
@@ -197,19 +200,19 @@ class LinkHookController extends Controller
 
             if ($stop->station_code == $departingStn) {
 
-                $result[2] = $this->trainStatus($stop->status);
+                $result["status"] = $this->trainStatus($stop->status);
 
-                if (!empty($stop->expected_departure_time)) $result[3] = $stop->expected_departure_time;
-                else if (!empty($stop->aimed_departure_time)) $result[3] = $stop->aimed_departure_time;
-                else $result[3] = "UNKNOWN";
+                if (!empty($stop->expected_departure_time)) $result["departure_time"] = $stop->expected_departure_time;
+                else if (!empty($stop->aimed_departure_time)) $result["departure_time"] = $stop->aimed_departure_time;
+                else $result["departure_time"] = "UNKNOWN";
             }
 
             if ($stop->station_code == $arrivalStn) {
-                if (!empty($stop->expected_arrival_time)) $result[0] = $stop->expected_arrival_time;
-                else if (!empty($stop->aimed_arrival_time)) $result[0] = $stop->aimed_arrival_time;
-                else $result[0] = "UNKNOWN";
+                if (!empty($stop->expected_arrival_time)) $result["arrival_time"] = $stop->expected_arrival_time;
+                else if (!empty($stop->aimed_arrival_time)) $result["arrival_time"] = $stop->aimed_arrival_time;
+                else $result["arrival_time"] = "UNKNOWN";
 
-                $result[1] = date('H:i', strtotime("$result[0]"));
+                $result['arrival_time'] = date('H:i', strtotime("$result[arrival_time]"));
             }
         }
 
@@ -287,7 +290,7 @@ class LinkHookController extends Controller
         $this->lineOne = "Good evening! ETA $timeHome";
         $this->lineTwo = "Koss is en route home and has just left St Pancras. Train is $statusTrain due to arrive to Ebbsfleet at $timeMarden. Traffic home is $drivingCondition, ETA $timeHome. Have a wonderful evening.";
 
-        $this->sendToIffft();
+        $this->sendToIffft("K");
 
     }
 
@@ -311,7 +314,38 @@ class LinkHookController extends Controller
         $this->lineOne = "Good morning. Roads are $drivingCondition.";
         $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave in 15 minutes, you should be at KCC at $arrivalTime. $directions. ";
 
-        $this->sendToIffft();
+        $this->sendToIffft("L");
+    }
+
+    public function kossMorningCommute()
+    {
+        //fremlin+walk+car+park&waypoints=Dean+street+maidstone
+        $drivingTimes = $this->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
+
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 6;
+
+        $commuteTime = $walkingTime+$drivingTime;
+        $timeNow = now();
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 1 hour + 20 minutes"));
+
+        $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
+
+        $departingStn = "EBD";
+        $arrivalStn = "SPX";
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime));
+        $mainResponse = json_decode($mainResponse);
+        $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
+        $trainDeparture = $times["departure_time"];
+
+
+        $this->lineOne = "Good morning. Roads are $drivingCondition.";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform at $arrivalTime and in time for $trainDeparture train. $directions";
+
+        $this->sendToIffft("K");
     }
 
     public function processHeathRoadTurn($turn, $alternative) {
@@ -409,7 +443,7 @@ class LinkHookController extends Controller
 
     }
 
-    private function sendToIffft($alternative_api = false) {
+    private function sendToIffft($recipient) {
 
         if ($this->debug) {
             $response = "<br> $this->lineOne <br> $this->lineTwo";
@@ -417,8 +451,7 @@ class LinkHookController extends Controller
             return 0;
         }
 
-        if ($alternative_api) $api = "IFTTTY";
-        else $api = "IFTTT";
+        $api = "IFTTT_" . $recipient;
 
         try {
             $hook = new LinkHook($api, [
