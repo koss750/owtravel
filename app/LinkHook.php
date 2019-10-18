@@ -9,6 +9,7 @@
 namespace App;
 
 use GuzzleHttp;
+use Illuminate\Support\Facades\Cache;
 
 class LinkHook extends BaseModel
 {
@@ -49,6 +50,15 @@ class LinkHook extends BaseModel
             else abort (500, "Failed inserting params into hook url");
         }
 
+        $response = Cache::remember($this->url, 5, function () {
+            try {
+                return $this->client->get($this->url);
+            } catch (\Exception $e) {
+                if ($this->debug) echo "500, Could not get response from hook $e";
+                else abort (500, "Could not get response from hook");
+                return 0;
+            }
+        });
 
         try {
             $response = $this->client->get($this->url);
