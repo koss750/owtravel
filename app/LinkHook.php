@@ -48,9 +48,9 @@ class LinkHook extends BaseModel
         } catch (\Exception $e) {
             if ($this->debug) echo "500, Failed inserting params into hook url. $e";
             else abort (500, "Failed inserting params into hook url");
-	}
+	    }
 
-	$hashKey = substr(md5($this->url), 0, 8);
+	    $hashKey = substr(md5($this->url), 0, 8);
 
         $response = Cache::remember($hashKey, 5, function () {
             try {
@@ -73,8 +73,8 @@ class LinkHook extends BaseModel
             $this->fullResponse = $response->getBody()->getContents();
             $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
-            if ($this->debug) echo "500, Failed while pricessing response from hook $e";
-            else abort (500, "Failed while pricessing response from hook");
+            if ($this->debug) echo "500, Failed while processing response from hook $e";
+            else abort (500, "Failed while processing response from hook");
         }
 
     }

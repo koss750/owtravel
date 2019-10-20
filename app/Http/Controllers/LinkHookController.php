@@ -305,14 +305,14 @@ class LinkHookController extends Controller
         $drivingCondition = $this->trafficCondition($trafficRatio);
         $walkingTime = 11;
 
-        $commuteTime = $walkingTime+$drivingTime+15;
+        $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
         $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 1 hour"));
 
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
 
         $this->lineOne = "Good morning. Roads are $drivingCondition.";
-        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave in 15 minutes, you should be at KCC at $arrivalTime. $directions. ";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave now, you should be at KCC at $arrivalTime. $directions. ";
 
         $this->sendToIffft("L");
     }
@@ -351,9 +351,9 @@ class LinkHookController extends Controller
     public function processHeathRoadTurn($turn, $alternative) {
 
         if ($turn == "turn-right") {
-            return "Dean Street is faster. If you take Loose Road, it would take $alternative minutes.";
+            return "Dean Street is faster. (Loose Rd - $alternative min).";
         }
-        else return "Loose Road is faster. If you take Dean Street, it would take $alternative minutes.";
+        else return "Loose Road is faster. (Dean St - $alternative min).";
 
     }
 
