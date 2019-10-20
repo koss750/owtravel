@@ -50,7 +50,7 @@ class LinkHook extends BaseModel
             else abort (500, "Failed inserting params into hook url");
         }
 
-        $response = Cache::remember($this->url, 5, function () {
+        $response = Cache::remember(base64_encode($this->url), 5, function () {
             try {
                 return $this->client->get($this->url);
             } catch (\Exception $e) {
