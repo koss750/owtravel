@@ -157,7 +157,7 @@ class LinkHookController extends Controller
 
         $ratio = (($duration_in_traffic - $duration) / $duration) * 100;
         $in_minutes = $duration / 60;
-        $in_minutes_in_traffic = $duration / 60;
+        $in_minutes_in_traffic = $duration_in_traffic / 60;
         $round_mins = round($in_minutes, 0);
         $round_mins_in_traffic = round($in_minutes_in_traffic, 0);
         $round_ratio = round($ratio);
@@ -185,6 +185,32 @@ class LinkHookController extends Controller
 
     private function nationalRailStationLive($departingStn, $arrivalStn, $offset)
     {
+        if ($offset>120) {
+            $aboveHr = $offset-120;
+            if ($aboveHr<10) {
+                $offset="02:0$aboveHr";
+            }
+            else {
+                $offset = "02:$aboveHr";
+            }
+        }
+        else if ($offset>60) {
+            $aboveHr = $offset-60;
+            if ($aboveHr<10) {
+                $offset="01:0$aboveHr";
+            }
+            else {
+                $offset = "01:$aboveHr";
+            }
+        }
+        else {
+            if ($offset<10) {
+                $offset="00:0$offset";
+            }
+            else {
+                $offset = "00:$offset";
+            }
+        }
         $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset], $this->debug);
         return $hook->fullResponse;
     }
@@ -205,6 +231,8 @@ class LinkHookController extends Controller
                 if (!empty($stop->expected_departure_time)) $result["departure_time"] = $stop->expected_departure_time;
                 else if (!empty($stop->aimed_departure_time)) $result["departure_time"] = $stop->aimed_departure_time;
                 else $result["departure_time"] = "UNKNOWN";
+
+                $result["platform"] = $stop->platform;
             }
 
             if ($stop->station_code == $arrivalStn) {
@@ -319,7 +347,7 @@ class LinkHookController extends Controller
 
     public function kossMorningCommute()
     {
-        //fremlin+walk+car+park&waypoints=Dean+street+maidstone
+
         $drivingTimes = $this->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
 
         $drivingTime = $drivingTimes[1];
@@ -336,16 +364,25 @@ class LinkHookController extends Controller
 
         $departingStn = "EBD";
         $arrivalStn = "SPX";
-        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime));
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
         $mainResponse = json_decode($mainResponse);
-        $times = $this->nationalRailSpecificTrain($mainResponse->departures->all[0]->service_timetable->id, $departingStn, $arrivalStn);
+        $times = $this->nationalRailSpecificTrain($this->nationalRailNextFromPlatform($mainResponse, [5, 2]), $departingStn, $arrivalStn);
         $trainDeparture = $times["departure_time"];
+        $platform = $times["platform"];
+
+        $atWork = date('H:i', strtotime("$trainDeparture + 32 minutes"));
 
 
         $this->lineOne = "Good morning. Roads are $drivingCondition.";
-        $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform at $arrivalTime and in time for $trainDeparture train. $directions";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
 
         $this->sendToIffft("K");
+    }
+
+    private function nationalRailNextFromPlatform($darwinResponse, $platforms) {
+        foreach ($darwinResponse->departures->all as $item) {
+            if (in_array($item->platform, $platforms)) return $item->service_timetable->id;
+        }
     }
 
     public function processHeathRoadTurn($turn, $alternative) {
@@ -358,12 +395,12 @@ class LinkHookController extends Controller
     }
 
     public function compareDrivingTimes($from, $to, $via1, $via2) {
-        $to = $to . $via2;
-        $drivingTimes1 = $this->googleDrivingTime($from, $to);
+        $firstRoute = $to . $via2;
+        $drivingTimes1 = $this->googleDrivingTime($from, $firstRoute);
         $drivingTime1 = $drivingTimes1[1];
 
-        $to = $to . $via1;
-        $drivingTimes2 = $this->googleDrivingTime($from, $to);
+        $secondRoute = $to . $via1;
+        $drivingTimes2 = $this->googleDrivingTime($from, $secondRoute);
         $drivingTime2 = $drivingTimes2[1];
 
         if ($drivingTime1<=$drivingTime2) {
