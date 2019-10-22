@@ -52,9 +52,10 @@ class LinkHook extends BaseModel
 
 	    $hashKey = substr(md5($this->url), 0, 8);
 
-        $response = Cache::remember($hashKey, 5, function () {
+        $this->fullResponse = Cache::remember($hashKey, 5, function () {
             try {
-                return $this->client->get($this->url);
+                $response = $this->client->get($this->url);
+                return $response->getBody()->getContents();
             } catch (\Exception $e) {
                 if ($this->debug) echo "500, Could not get response from hook $e";
                 else abort (500, "Could not get response from hook");
@@ -63,7 +64,6 @@ class LinkHook extends BaseModel
         });
 
         try {
-            $this->fullResponse = $response->getBody()->getContents();
             $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
             if ($this->debug) echo "500, Failed while processing response from hook $e";
