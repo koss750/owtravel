@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\LinkHook;
+use Illuminate\Support\Facades\Cache;
 
 class LinkHookController extends Controller
 {
@@ -142,6 +143,10 @@ class LinkHookController extends Controller
         if ($from=="home") {
             $from = "2+Cricketers+way+coxheath";
             $routeOptimization = true;
+        }
+
+        if ($to=="home") {
+            $to = "2+Cricketers+way+coxheath";
         }
 
         $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to], $this->debug);
@@ -482,25 +487,39 @@ class LinkHookController extends Controller
 
     private function sendToIffft($recipient) {
 
-        if ($this->debug) {
-            $response = "<br> $this->lineOne <br> $this->lineTwo";
+        $api = "IFTTT_" . $recipient;
+
+        $toProceed = true;
+
+        if ($this->debug) $toProceed = false;
+        if (Cache::pull($api)) $toProceed = false;
+
+        if (!$toProceed) {
+            $response = "<br>To be sent to IFFFT:<br>";
+            $response .= "<br> $this->lineOne <br> $this->lineTwo";
             echo $response;
             return 0;
         }
 
-        $api = "IFTTT_" . $recipient;
-
         try {
+
+            $expiresAt = now()->addMinutes(5);
+            Cache::put($api , true, $expiresAt);
+
             $hook = new LinkHook($api, [
                 'API_VAR1' => $this->lineOne,
                 'API_VAR2' => $this->lineTwo,
                 'API_ACTION' => $this->action
             ], $this->debug
             );
+
             echo $hook->fullResponse;
         } catch (\Exception $e) {
+
+            Cache::forget($api);
             if ($this->debug) echo "500, Error passing information to IFTTT $e";
             abort('500', "Error passing information to IFTTT");
+
         }
     }
 
