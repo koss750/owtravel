@@ -63,13 +63,6 @@ class LinkHook extends BaseModel
         });
 
         try {
-            $response = $this->client->get($this->url);
-        } catch (\Exception $e) {
-            if ($this->debug) echo "500, Could not get response from hook $e";
-            else abort (500, "Could not get response from hook");
-        }
-
-        try {
             $this->fullResponse = $response->getBody()->getContents();
             $this->objectResponse = json_decode($this->fullResponse);
         } catch (\Exception $e) {
