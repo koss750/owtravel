@@ -495,7 +495,7 @@ class LinkHookController extends Controller
         if (Cache::pull($api)) $toProceed = false;
 
         if (!$toProceed) {
-            $response = "<br>To be sent to IFFFT:<br>";
+            $response = "<br>The following was sent to IFTTT less than 5 mins ago:<br>";
             $response .= "<br> $this->lineOne <br> $this->lineTwo";
             echo $response;
             return 0;
