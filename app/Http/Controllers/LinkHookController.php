@@ -44,23 +44,23 @@ class LinkHookController extends Controller
 
             switch ($hook) {
                 case "we":
-                    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun']);
+                //    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun']);
                     return $this->waterlooEast();
                     break;
                 case "pw":
-                    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun']);
+                //    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun']);
                     return $this->paddockWood();
                     break;
                 case "wu":
-                    if (!$this->debug) $this->dieOfCurfew(['6', '23'], ['Sat', 'Sun'], ['text']);
+                //    if (!$this->debug) $this->dieOfCurfew(['6', '23'], ['Sat', 'Sun'], ['text']);
                     return $this->wakeUp();
                     break;
                 case "lc":
-                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun']);
+                //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
                     return $this->lizzieMorningCommute();
                     break;
                 case "kc":
-                    if (!$this->debug) $this->dieOfCurfew(['5', '21'], ['Sat', 'Sun']);
+                //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
                     return $this->kossMorningCommute();
                     break;
             }
@@ -518,7 +518,7 @@ class LinkHookController extends Controller
 
             Cache::forget($api);
             if ($this->debug) echo "500, Error passing information to IFTTT $e";
-            abort('500', "Error passing information to IFTTT");
+            abort('500', "Error passing information to IFTTT $e");
 
         }
     }

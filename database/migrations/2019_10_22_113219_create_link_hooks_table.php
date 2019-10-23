@@ -15,12 +15,12 @@ class CreateLinkHooksTable extends Migration
     {
         Schema::create('link_hooks', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('url');
-            $table->string('type');
+            $table->mediumText('url');
+            $table->mediumText('type');
             $table->json('object_response');
-            $table->json('full_response');
+            $table->mediumText('full_response');
             $table->json('params');
-            $table->string('debug');
+            $table->boolean('debug');
             $table->timestamps();
         });
     }

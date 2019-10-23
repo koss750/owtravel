@@ -69,7 +69,7 @@ class LinkHook extends BaseModel
             $this->generateAuditEntry();
         } catch (\Exception $e) {
             if ($this->debug) echo "500, Failed while processing response from hook $e";
-            else abort (500, "Failed while processing response from hook");
+            else abort (500, "Failed while processing response from hook $this->type $e");
         }
 
     }
@@ -92,11 +92,11 @@ class LinkHook extends BaseModel
             $audit->object_response=json_encode($this->objectResponse);
             $audit->full_response=$this->fullResponse;
             $audit->params=json_encode($this->params);
-            $audit->debug=$this->debug;
+            $audit->debug=$this->debug ?? false;
             $audit->save();
         } catch (\Exception $e) {
             if ($this->debug) echo "500, Failed while generating audit entry. $e";
-            else abort (500, "Failed while generating audit entry.");
+            else abort (500, "Failed while generating audit entry. $e");
         }
 
     }
