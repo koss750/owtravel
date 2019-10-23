@@ -376,7 +376,11 @@ class LinkHookController extends Controller
         $arrivalStn = "SPX";
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
         $mainResponse = json_decode($mainResponse);
-        $times = $this->nationalRailSpecificTrain($this->nationalRailNextFromPlatform($mainResponse, [5, 2]), $departingStn, $arrivalStn);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
+
+        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
+        else $times = 0;
+
         if ($times == 0) {  //No trains returned by Specific Train hook
             $this->lineOne = "Hello. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 20 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
