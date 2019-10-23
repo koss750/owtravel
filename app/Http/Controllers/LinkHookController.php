@@ -227,27 +227,32 @@ class LinkHookController extends Controller
         $data = $hook->objectResponse;
 
         $result = [];
-        foreach ($data->stops as $stop) {
+        if (isset($data->stops)) {
+            foreach ($data->stops as $stop) {
 
-            if ($stop->station_code == $departingStn) {
+                if ($stop->station_code == $departingStn) {
 
-                $result["status"] = $this->trainStatus($stop->status);
+                    $result["status"] = $this->trainStatus($stop->status);
 
-                if (!empty($stop->expected_departure_time)) $result["departure_time"] = $stop->expected_departure_time;
-                else if (!empty($stop->aimed_departure_time)) $result["departure_time"] = $stop->aimed_departure_time;
-                else $result["departure_time"] = "UNKNOWN";
+                    if (!empty($stop->expected_departure_time)) $result["departure_time"] = $stop->expected_departure_time;
+                    else if (!empty($stop->aimed_departure_time)) $result["departure_time"] = $stop->aimed_departure_time;
+                    else $result["departure_time"] = "UNKNOWN";
 
-                $result["platform"] = $stop->platform;
-            }
+                    $result["platform"] = $stop->platform;
+                }
 
-            if ($stop->station_code == $arrivalStn) {
-                if (!empty($stop->expected_arrival_time)) $result["arrival_time"] = $stop->expected_arrival_time;
-                else if (!empty($stop->aimed_arrival_time)) $result["arrival_time"] = $stop->aimed_arrival_time;
-                else $result["arrival_time"] = "UNKNOWN";
+                if ($stop->station_code == $arrivalStn) {
+                    if (!empty($stop->expected_arrival_time)) $result["arrival_time"] = $stop->expected_arrival_time;
+                    else if (!empty($stop->aimed_arrival_time)) $result["arrival_time"] = $stop->aimed_arrival_time;
+                    else $result["arrival_time"] = "UNKNOWN";
 
-                $result['arrival_time'] = date('H:i', strtotime("$result[arrival_time]"));
+                    $result['arrival_time'] = date('H:i', strtotime("$result[arrival_time]"));
+                }
             }
         }
+
+        else $result = 0;
+
 
         return $result;
 
@@ -372,15 +377,17 @@ class LinkHookController extends Controller
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
         $mainResponse = json_decode($mainResponse);
         $times = $this->nationalRailSpecificTrain($this->nationalRailNextFromPlatform($mainResponse, [5, 2]), $departingStn, $arrivalStn);
-        $trainDeparture = $times["departure_time"];
-        $platform = $times["platform"];
-
-        $atWork = date('H:i', strtotime("$trainDeparture + 32 minutes"));
-
-
-        $this->lineOne = "Good morning. Roads are $drivingCondition.";
-        $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
-
+        if ($times == 0) {  //No trains returned by Specific Train hook
+            $this->lineOne = "Hello. Roads are $drivingCondition.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 20 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
+        }
+        else {
+            $trainDeparture = $times["departure_time"];
+            $platform = $times["platform"];
+            $atWork = date('H:i', strtotime("$trainDeparture + 32 minutes"));
+            $this->lineOne = "Good morning. Roads are $drivingCondition.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
+        }
         $this->sendToIffft("K");
     }
 
