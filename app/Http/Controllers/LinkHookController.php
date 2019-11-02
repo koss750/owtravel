@@ -345,7 +345,7 @@ class LinkHookController extends Controller
 
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
-        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 1 hour"));
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
 
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
 
