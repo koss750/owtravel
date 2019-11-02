@@ -63,6 +63,10 @@ class LinkHookController extends Controller
                 //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
                     return $this->kossMorningCommute();
                     break;
+                case "kw":
+                    //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
+                    return $this->kossEveningCommuteAdvanceNotice();
+                    break;
             }
 
         }
@@ -393,6 +397,39 @@ class LinkHookController extends Controller
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
         }
         $this->sendToIffft("K");
+    }
+
+    public function kossEveningCommuteAdvanceNotice()
+    {
+
+        $drivingTimes = $this->googleDrivingTime( "ebbsfleet+international", "home");
+
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 17;
+        $departingStn = "SPX";
+        $arrivalStn = "EBD";
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($walkingTime));
+        $mainResponse = json_decode($mainResponse);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [11, 12, 13]);
+        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
+        else $times = 0;
+
+        if ($times == 0) {  //No trains returned by Specific Train hook
+            $this->lineOne = "Hello creator";
+            $this->lineTwo = "Weird shit is happening with the trains, none seem to be operating. Sorry if it's true";
+        }
+        else {
+            $trainDeparture = $times["departure_time"];
+            $trainArrival = $times["arrival_time"];
+            $platform = $times["platform"];
+            $atHome = date('H:i', strtotime("$trainArrival + $drivingTime minutes"));
+            $this->lineOne = "Good evening creator.";
+            $this->lineTwo = "You should make the $trainDeparture train (platform $platform). Roads are $drivingCondition, will take $drivingTime min to drive home, getting you there at $atHome";
+            $this->sendToIffft("K");
+        }
     }
 
     private function nationalRailNextFromPlatform($darwinResponse, $platforms) {
