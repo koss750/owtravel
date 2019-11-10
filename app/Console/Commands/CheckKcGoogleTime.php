@@ -3,10 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\LinkHookController;
-use App\Jobs\checkKcTimes;
 use Illuminate\Console\Command;
 
-class checkKcGoogleTime extends Command
+class CheckKcGoogleTime extends Command
 {
 
     public $controller;
@@ -43,11 +42,13 @@ class checkKcGoogleTime extends Command
     public function handle()
     {
         $times = $this->controller->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
-        $this->info($times[1]);
-        if($times[1]>46) {
+        $this->info("Drive: " . $times[1]);
+        if($times[1]>49) {
+            $this->controller->kossMorningCommute();
+            $this->controller->action = "voip";
+            $this->controller->lineOne = "Good morning creator. Commute Issue. ";
+            $this->controller->sendToIffft("K");
             $this->controller->action = "notification";
-            $this->controller->lineOne = "Commute Warning! $times[1]";
-            $this->controller->lineTwo = "DropLiks carried out the check";
             $this->controller->sendToIffft("K");
         }
     }

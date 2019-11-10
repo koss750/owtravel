@@ -57,11 +57,13 @@ class LinkHookController extends Controller
                     break;
                 case "lc":
                 //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
-                    return $this->lizzieMorningCommute();
+                    $this->lizzieMorningCommute();
+                    return $this->sendToIffft("L");
                     break;
                 case "kc":
                 //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
-                    return $this->kossMorningCommute();
+                    $this->kossMorningCommute();
+                    return $this->sendToIffft("K");
                     break;
                 case "kw":
                     //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
@@ -360,8 +362,6 @@ class LinkHookController extends Controller
 
         $this->lineOne = "Good morning. Roads are $drivingCondition.";
         $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave now, you should be at KCC at $arrivalTime. $directions. ";
-
-        $this->sendToIffft("L");
     }
 
     public function kossMorningCommute()
@@ -377,7 +377,7 @@ class LinkHookController extends Controller
 
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
-        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 1 hour + 20 minutes"));
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 20 minutes"));
 
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
 
@@ -401,7 +401,6 @@ class LinkHookController extends Controller
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
         }
-        $this->sendToIffft("K");
     }
 
     public function kossEveningCommuteAdvanceNotice()
@@ -557,7 +556,7 @@ class LinkHookController extends Controller
         try {
 
             $expiresAt = now()->addMinutes(5);
-            Cache::put($api , true, $expiresAt);
+            Cache::put($this->action.$api , true, $expiresAt);
 
             $hook = $this->hookUp($api, [
                 'API_VAR1' => $this->lineOne,
