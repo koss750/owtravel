@@ -14,8 +14,8 @@ class LinkHookController extends Controller
     public $debug;
     public $curfew;
     public $client;
-    private $lineOne;
-    private $lineTwo;
+    public $lineOne;
+    public $lineTwo;
 
 
     public function index($action, $hook) {
@@ -132,7 +132,7 @@ class LinkHookController extends Controller
         ];
 
         try {
-            $hook = new LinkHook('IFTTT', $params);
+            $hook = $this->hookUp('IFTTT', $params);
             return $hook->fullResponse;
         } catch (\Exception $e) {
             abort('500', "Error passing information to IFTTT");
@@ -140,7 +140,7 @@ class LinkHookController extends Controller
 
     }
 
-    private function googleDrivingTime($from, $to)
+    public function googleDrivingTime($from, $to)
     {
         $routeOptimization = false;
 
@@ -153,7 +153,7 @@ class LinkHookController extends Controller
             $to = "2+Cricketers+way+coxheath";
         }
 
-        $hook = new LinkHook('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to], $this->debug);
+        $hook = $this->hookUp('GOOGLE_MAPS', ['API_FROM' => $from, 'API_TO' => $to], $this->debug);
         $response = json_decode($hook->fullResponse);
 
         $duration = $response->routes[0]->legs[0]->duration->value;
@@ -192,7 +192,7 @@ class LinkHookController extends Controller
         return $drivingCondition;
     }
 
-    private function nationalRailStationLive($departingStn, $arrivalStn, $offset)
+    public function nationalRailStationLive($departingStn, $arrivalStn, $offset)
     {
         if ($offset>120) {
             $aboveHr = $offset-120;
@@ -220,14 +220,19 @@ class LinkHookController extends Controller
                 $offset = "00:$offset";
             }
         }
-        $hook = new LinkHook('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset], $this->debug);
+        $hook = $this->hookUp('NATIONAL_RAIL', ['API_FROM' => $departingStn, 'API_TO' => $arrivalStn, 'API_OFFSET' => $offset], $this->debug);
         return $hook->fullResponse;
+    }
+
+    protected function hookUp($type, $params, $debug = false)
+    {
+        return new LinkHook($type, $params, $debug);
     }
 
     private function nationalRailSpecificTrain($service, $departingStn, $arrivalStn)
     {
 
-        $hook = new LinkHook("BASIC", ['API_URL' => $service], $this->debug);
+        $hook = $this->hookUp("BASIC", ['API_URL' => $service], $this->debug);
         $data = $hook->objectResponse;
 
         $result = [];
@@ -518,7 +523,7 @@ class LinkHookController extends Controller
     {
 
         // fetch Aeris API output as a string and decode into an object
-        $hook = new LinkHook ("W", ['city' => 'maidstone, uk']);
+        $hook = $this->hookUp ("W", ['city' => 'maidstone, uk']);
         $weather = $hook->objectResponse;
 
         if ($weather->success == true) {
@@ -533,7 +538,7 @@ class LinkHookController extends Controller
 
     }
 
-    private function sendToIffft($recipient) {
+    public function sendToIffft($recipient) {
 
         $api = "IFTTT_" . $recipient;
 
@@ -554,7 +559,7 @@ class LinkHookController extends Controller
             $expiresAt = now()->addMinutes(5);
             Cache::put($api , true, $expiresAt);
 
-            $hook = new LinkHook($api, [
+            $hook = $this->hookUp($api, [
                 'API_VAR1' => $this->lineOne,
                 'API_VAR2' => $this->lineTwo,
                 'API_ACTION' => $this->action

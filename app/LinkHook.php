@@ -47,7 +47,7 @@ class LinkHook extends BaseModel
             $this->insertParams();
             if ($this->debug) echo ($this->url . "<br>");
         } catch (\Exception $e) {
-            if ($this->debug) echo "500, Failed inserting params into hook url. $e";
+            if ($this->debug) report($e);
             else abort (500, "Failed inserting params into hook url");
 	    }
 
@@ -58,7 +58,7 @@ class LinkHook extends BaseModel
                 $response = $this->client->get($this->url);
                 return $response->getBody()->getContents();
             } catch (\Exception $e) {
-                if ($this->debug) echo "500, Could not get response from hook $e";
+                if ($this->debug) report($e);
                 else abort (500, "Could not get response from hook");
                 return 0;
             }
@@ -68,7 +68,7 @@ class LinkHook extends BaseModel
             $this->objectResponse = json_decode($this->fullResponse);
             $this->generateAuditEntry();
         } catch (\Exception $e) {
-            if ($this->debug) echo "500, Failed while processing response from hook $e";
+            if ($this->debug) report($e);
             else abort (500, "Failed while processing response from hook $this->type $e");
         }
 
@@ -95,7 +95,7 @@ class LinkHook extends BaseModel
             $audit->debug=$this->debug ?? false;
             $audit->save();
         } catch (\Exception $e) {
-            if ($this->debug) echo "500, Failed while generating audit entry. $e";
+            if ($this->debug) report($e);
             else abort (500, "Failed while generating audit entry. $e");
         }
 
