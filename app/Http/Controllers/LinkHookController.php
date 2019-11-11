@@ -358,10 +358,10 @@ class LinkHookController extends Controller
         $timeNow = now();
         $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
 
-        $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
+        $directions = $this->processHeathRoadTurn($drivingTimes[3], ($drivingTimes["alternative"]-$drivingTime[1]));
 
         $this->lineOne = "Good morning! Roads are $drivingCondition.";
-        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. $directions. ";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. $directions";
     }
 
     public function kossMorningCommute()
@@ -445,9 +445,9 @@ class LinkHookController extends Controller
     public function processHeathRoadTurn($turn, $alternative) {
 
         if ($turn == "turn-right") {
-            return "Dean Street is faster. (Loose Rd - $alternative min).";
+            return "Dean Street is faster. (Loose Rd - $alternative min slower).";
         }
-        else return "Loose Road is faster. (Dean St - $alternative min).";
+        else return "Loose Road is faster. (Dean St - $alternative min slower).";
 
     }
 
@@ -550,7 +550,7 @@ class LinkHookController extends Controller
             $response = "<br>The following was sent to IFTTT less than 5 mins ago:<br>";
             $response .= "<br> $this->lineOne <br> $this->lineTwo";
             echo $response;
-            return 0;
+            return;
         }
 
         try {
