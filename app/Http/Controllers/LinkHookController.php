@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Link;
 use App\LinkHook;
 use App\LinkLog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class LinkHookController extends Controller
@@ -525,6 +526,27 @@ class LinkHookController extends Controller
         //[2] is status of train
         //[3] estimated departure time of train
         //[4] traffic conditions
+    }
+
+    public function eveningWeather() {
+        $date = today()->addDay(1)->toDateString();
+        $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date . '08:00:00','Europe/London');
+        $timestamp = $carbon_obj->timestamp;
+
+        $hook = $this->hookUp("DARK_SKY", [
+            'API_TIME' => $timestamp
+        ], $this->debug
+        );
+
+        $response = $hook->objectResponse->currently;
+        $summary = $response->summary;
+        $temperature = round(($response->temperature - 32) / 1.8);
+        $rainChance = $response->precipProbability;
+        $rainPower = $response->precipIntensity;
+
+        $this->lineOne = "Good evening! Weather report:";
+        $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity - $rainPower";
+
     }
 
     private function get_weather_in_maidstone()

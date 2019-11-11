@@ -31,6 +31,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('link:check:lc')
             ->weekdays()
             ->at('7:45');
+        $schedule->command('link:check:ew')
+            ->daily()
+            ->at('21:45');
     }
 
     /**
