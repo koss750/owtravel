@@ -574,8 +574,6 @@ class LinkHookController extends Controller
 
                 $this->log($api, $this->action, $hook->fullResponse);
 
-                $this->respond(true);
-
             } catch (\Exception $e) {
 
                 Cache::forget($api);
