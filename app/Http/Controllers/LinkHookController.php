@@ -360,8 +360,8 @@ class LinkHookController extends Controller
 
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $drivingTimes["alternative"]);
 
-        $this->lineOne = "Good morning. Roads are $drivingCondition.";
-        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. If you leave now, you should be at KCC at $arrivalTime. $directions. ";
+        $this->lineOne = "Good morning! Roads are $drivingCondition.";
+        $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. $directions. ";
     }
 
     public function kossMorningCommute()
