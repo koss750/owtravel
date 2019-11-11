@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\LinkLog;
 use Illuminate\Http\Request;
 
 class LinkLogController extends Controller
@@ -12,20 +13,22 @@ class LinkLogController extends Controller
      * @return void
      */
 
-    public $linkLogController;
+    public $linkLog;
 
-    public function __construct(LinkLogController $linkLogController)
+    public function __construct(LinkLog $linkLog)
     {
-        $this->linkLogController = $linkLogController;
+        $this->linkLog = $linkLog;
     }
 
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Http\Response
+     * @param $type
+     * @param $subtype
+     * @return void
      */
-    public function store()
+    public function getCurrentStatus($type, $subtype)
     {
-
+        $latest = LinkLog::where('type', $type)->where('subtype', $subtype)->latest()->first();
     }
 }
