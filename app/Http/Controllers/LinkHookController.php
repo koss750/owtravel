@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Link;
 use App\LinkHook;
+use App\LinkLog;
 use Illuminate\Support\Facades\Cache;
 
 class LinkHookController extends Controller
@@ -358,7 +360,8 @@ class LinkHookController extends Controller
         $timeNow = now();
         $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
 
-        $slowerBy = $drivingTimes["alternative"]-$drivingTime[1];
+
+        $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
 
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
 
@@ -447,9 +450,12 @@ class LinkHookController extends Controller
     public function processHeathRoadTurn($turn, $alternative) {
 
         if ($turn == "turn-right") {
-            return "Dean Street is faster. (Loose Rd - $alternative min slower).";
+            if ($alternative < 5) {
+                return "Loose Road is only $alternative min slower";
+            }
+            return "Dean Street is $alternative min faster";
         }
-        else return "Loose Road is faster. (Dean St - $alternative min slower).";
+        else return "Loose Road is $alternative min faster";
 
     }
 
@@ -552,29 +558,40 @@ class LinkHookController extends Controller
             $response = "<br>The following was sent to IFTTT less than 5 mins ago:<br>";
             $response .= "<br> $this->lineOne <br> $this->lineTwo";
             echo $response;
-            return;
         }
+        else {
+            try {
 
-        try {
+                $expiresAt = now()->addMinutes(4);
+                Cache::put($this->action . $api, true, $expiresAt);
 
-            $expiresAt = now()->addMinutes(5);
-            Cache::put($this->action.$api , true, $expiresAt);
+                $hook = $this->hookUp($api, [
+                    'API_VAR1' => $this->lineOne,
+                    'API_VAR2' => $this->lineTwo,
+                    'API_ACTION' => $this->action
+                ], $this->debug
+                );
 
-            $hook = $this->hookUp($api, [
-                'API_VAR1' => $this->lineOne,
-                'API_VAR2' => $this->lineTwo,
-                'API_ACTION' => $this->action
-            ], $this->debug
-            );
+                $this->log($api, $this->action, $hook->fullResponse);
 
-            echo $hook->fullResponse;
-        } catch (\Exception $e) {
+                $this->respond(true);
 
-            Cache::forget($api);
-            if ($this->debug) echo "500, Error passing information to IFTTT $e";
-            abort('500', "Error passing information to IFTTT $e");
+            } catch (\Exception $e) {
 
+                Cache::forget($api);
+                if ($this->debug) report($e);
+                abort('500', "Error passing information to IFTTT $e");
+
+            }
         }
+    }
+
+    public function log($type, $subtype, $value) {
+        $log = new LinkLog;
+        $log->type = $type;
+        $log->subtype = $subtype;
+        $log->value = $value;
+        $log->save();
     }
 
 

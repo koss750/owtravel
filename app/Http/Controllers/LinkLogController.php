@@ -13,11 +13,13 @@ class LinkLogController extends Controller
      * @return void
      */
 
-    public $linkLog;
+    public $type;
+    public $subtype;
+    public $value;
 
-    public function __construct(LinkLog $linkLog)
+    public function __construct()
     {
-        $this->linkLog = $linkLog;
+
     }
 
     /**

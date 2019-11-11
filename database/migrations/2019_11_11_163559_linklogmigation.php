@@ -17,7 +17,7 @@ class Linklogmigation extends Migration
             $table->increments('id');
             $table->mediumText('type');
             $table->mediumText('subtype');
-            $table->json('value');
+            $table->mediumText('value');
             $table->timestamps();
         });
     }

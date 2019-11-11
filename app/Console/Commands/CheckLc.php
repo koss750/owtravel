@@ -42,6 +42,9 @@ class CheckLc extends Command
     public function handle()
     {
         $this->controller->lizzieMorningCommute();
+        $this->info($this->controller->lineOne);
+        $this->info($this->controller->lineTwo);
+        //die();
         $this->controller->action = "notification";
         $this->controller->sendToIffft("L");
     }
