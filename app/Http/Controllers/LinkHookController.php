@@ -23,7 +23,6 @@ class LinkHookController extends Controller
         if (isset($action)) {
 
             $this->action = $action;
-
             switch ($action) {
                 case "debug":
                     $this->debug = true;
@@ -31,6 +30,8 @@ class LinkHookController extends Controller
                 case "notification":
                     break;
                 case "text":
+                    break;
+                case "voip":
                     break;
                 default:
                     abort(404, "Action undefined");
@@ -41,7 +42,6 @@ class LinkHookController extends Controller
         if (isset($hook)) {
 
             $this->hook = $hook;
-
             switch ($hook) {
                 case "we":
                 //    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun']);
