@@ -358,7 +358,9 @@ class LinkHookController extends Controller
         $timeNow = now();
         $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
 
-        $directions = $this->processHeathRoadTurn($drivingTimes[3], ($drivingTimes["alternative"]-$drivingTime[1]));
+        $slowerBy = $drivingTimes["alternative"]-$drivingTime[1];
+
+        $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
 
         $this->lineOne = "Good morning! Roads are $drivingCondition.";
         $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. $directions";
