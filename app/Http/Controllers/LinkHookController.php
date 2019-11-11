@@ -180,6 +180,16 @@ class LinkHookController extends Controller
             $turn = $response->routes[0]->legs[0]->steps[2]->maneuver;
         }
 
+        $logValue = [
+            "from" => $from,
+            "to" => $to,
+            "date" => Carbon::today()->toDateString(),
+            "time" => Carbon::now()->toTimeString(),
+            "timestamp" => Carbon::now(),
+            "time_in_traffic" => $in_minutes_in_traffic
+        ];
+        $this->log("historic-information", "google-maps-request", json_encode($logValue));
+
         return [$round_mins, $round_mins_in_traffic, $round_ratio, ($turn ?? null)];
     }
 
@@ -450,6 +460,13 @@ class LinkHookController extends Controller
     }
 
     public function processHeathRoadTurn($turn, $alternative) {
+
+        $logValue = [
+            "turn" => $turn,
+            "faster_by" => $alternative,
+            "date" => Carbon::today()->toDateString()
+        ];
+        $this->log("historic-information", "coxheath-maidstone-route", json_encode($logValue));
 
         if ($turn == "turn-right") {
             if ($alternative < 5) {
