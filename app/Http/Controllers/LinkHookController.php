@@ -612,7 +612,9 @@ class LinkHookController extends Controller
                 ], $this->debug
                 );
 
-                $this->log($api, $this->action, $hook->fullResponse);
+                $logValue = $this->lineOne . " " . $this->lineTwo;
+
+                $this->log($api, $this->action, $logValue);
 
             } catch (\Exception $e) {
 
