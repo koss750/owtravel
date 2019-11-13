@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class Linklogmigation extends Migration
+class Brodowns extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class Linklogmigation extends Migration
      */
     public function up()
     {
-        Schema::create('link_logs', function (Blueprint $table) {
+        Schema::create('brodowns', function (Blueprint $table) {
             $table->increments('id');
-            $table->mediumText('type');
-            $table->mediumText('subtype');
-            $table->mediumText('value');
+            $table->mediumText('name');
+            $table->mediumText('description');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class Linklogmigation extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('link_logs');
+        Schema::dropIfExists('brodowns');
     }
 }
