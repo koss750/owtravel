@@ -32,8 +32,7 @@ class Kernel extends ConsoleKernel
             ->weekdays()
             ->at('7:45');
         $schedule->command('link:check:ew')
-            ->daily()
-            ->at('21:45');
+            ->dailyAt('21:45');
     }
 
     /**
