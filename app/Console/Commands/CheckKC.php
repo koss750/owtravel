@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Http\Controllers\LinkHookController;
 use Illuminate\Console\Command;
 
-class CheckKcGoogleTime extends Command
+class CheckKC extends Command
 {
 
     public $controller;
@@ -45,9 +45,7 @@ class CheckKcGoogleTime extends Command
         $this->info("Drive: " . $times[1]);
         if($times[1]>49) {
             $this->controller->kossMorningCommute();
-            $this->controller->action = "voip";
             $this->controller->lineOne = "Good morning creator. Commute Issue. ";
-            $this->controller->sendToIffft("K");
             $this->controller->action = "notification";
             $this->controller->sendToIffft("K");
         }
