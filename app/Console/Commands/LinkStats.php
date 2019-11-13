@@ -7,7 +7,7 @@ use App\Link;
 use App\User;
 use Illuminate\Console\Command;
 
-class LinkStatistics extends Command
+class LinkStats extends Command
 {
     /**
      * The name and signature of the console command.
