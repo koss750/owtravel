@@ -33,6 +33,8 @@ class Kernel extends ConsoleKernel
             ->at('7:45');
         $schedule->command('link:check:ew')
             ->dailyAt('21:45');
+        $schedule->command('link:check:ew:compare')
+            ->dailyAt('20:00');
     }
 
     /**

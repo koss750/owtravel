@@ -566,6 +566,44 @@ class LinkHookController extends Controller
 
     }
 
+    public function oneHourWeather() {
+        $date = Carbon::now()->addHour(1)->startOfHour()->toDateTimeString();
+        $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date,'Europe/London');
+        $timestamp = $carbon_obj->timestamp;
+
+        $hook = $this->hookUp("DARK_SKY", [
+            'API_TIME' => $timestamp
+        ], $this->debug
+        );
+
+        $response = $hook->objectResponse->currently;
+        $rainChanceLater = $response->precipProbability;
+        $rainPowerLater = $response->precipIntensity;
+
+        $date = Carbon::now()->toDateTimeString();
+        $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date,'Europe/London');
+        $timestamp = $carbon_obj->timestamp;
+
+        $hook = $this->hookUp("DARK_SKY", [
+            'API_TIME' => $timestamp
+        ], $this->debug
+        );
+
+        $response = $hook->objectResponse->currently;
+        $rainChanceNow = $response->precipProbability;
+        $rainPowerNow = $response->precipIntensity;
+
+
+
+        $this->lineOne = [
+            "intensityNow" => $rainPowerNow,
+            "chanceNow" => $rainChanceNow,
+            "chanceLater" => $rainChanceLater,
+            "intensityLater" => $rainPowerLater
+        ];
+
+    }
+
     private function get_weather_in_maidstone()
     {
 
