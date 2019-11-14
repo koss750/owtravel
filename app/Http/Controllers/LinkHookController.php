@@ -558,8 +558,8 @@ class LinkHookController extends Controller
         $response = $hook->objectResponse->currently;
         $summary = $response->summary;
         $temperature = round(($response->temperature - 32) / 1.8);
-        $rainChance = $response->precipProbability;
-        $rainPower = $response->precipIntensity;
+        $rainChance = $response->precipProbability*100;
+        $rainPower = $response->precipIntensity*100;
 
         $this->lineOne = "Good evening! Weather report:";
         $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity - $rainPower";
