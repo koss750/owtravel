@@ -14,7 +14,7 @@ class CheckKC extends Command
      *
      * @var string
      */
-    protected $signature = 'link:check:kc';
+    protected $signature = 'link:check:kc {--debug}';
 
     /**
      * The console command description.
@@ -41,9 +41,10 @@ class CheckKC extends Command
      */
     public function handle()
     {
+        $debug = $this->option('debug');
         $times = $this->controller->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
         $this->info("Drive: " . $times[1]);
-        if($times[1]>49) {
+        if($times[1]>49 && !$debug) {
             $this->controller->kossMorningCommute();
             $this->controller->lineOne = "Good morning creator. Commute Issue. ";
             $this->controller->action = "notification";

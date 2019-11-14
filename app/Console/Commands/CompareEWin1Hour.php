@@ -14,7 +14,7 @@ class CompareEWin1Hour extends Command
      *
      * @var string
      */
-    protected $signature = 'link:check:ew:compare';
+    protected $signature = 'link:check:ew:compare {--debug}';
 
     /**
      * The console command description.
@@ -41,20 +41,25 @@ class CompareEWin1Hour extends Command
      */
     public function handle()
     {
+        $debug = $this->option('debug');
         $this->controller->oneHourWeather();
         $chanceLater = $this->controller->lineOne["chanceLater"];
         $chanceNow = $this->controller->lineOne["chanceNow"];
         $intNow = $this->controller->lineOne["intensityNow"];
         $intLater = $this->controller->lineOne["intensityLater"];
 
-        if (($chanceNow < $chanceLater) || ($intNow < $intLater)) {
+        if (
+            ($chanceNow < $chanceLater) || ($intNow < $intLater)
+        ) {
             $this->controller->lineOne = "Good evening! Weather warning!";
             $this->controller->lineTwo = "Chance of rain in 1 hour is getting higher at $chanceLater%. Intensity now is $intNow and will become $intLater";
             $this->info($this->controller->lineOne);
             $this->info($this->controller->lineTwo);
             $this->controller->action = "notification";
-            $this->controller->sendToIffft("K");
-            $this->controller->sendToIffft("L");
+            if (!$debug) {
+                $this->controller->sendToIffft("K");
+                $this->controller->sendToIffft("L");
+            }
         }
         else {
             $this->controller->lineOne = "Good evening. Weather information";
@@ -62,8 +67,10 @@ class CompareEWin1Hour extends Command
             $this->controller->action = "notification";
             $this->info($this->controller->lineOne);
             $this->info($this->controller->lineTwo);
-            $this->controller->sendToIffft("K");
-            $this->controller->sendToIffft("L");
+            if (!$debug) {
+                $this->controller->sendToIffft("K");
+                $this->controller->sendToIffft("L");
+            }
         }
 
     }

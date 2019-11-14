@@ -45,21 +45,16 @@ class LinkStats extends Command
         $ifttt = Link::where('type', 'LIKE', 'IFT%')->get()->count();
         $rail = Link::where('type', 'NATIONAL_RAIL')->get()->count();
         $rail2 = Link::where('type', 'BASIC')->get()->count();
-        $this->info($googleMaps);
-        $this->info($ifttt);
-        $this->info($rail+$rail2);
-        die();
-        $headers = ['Document', 'Number'];
+        $weather = Link::where('type', 'DARK_SKY')->get()->count();
+        $headers = ['IFTTT', 'Maps', 'Rail', 'Weather'];
 
-        foreach ($docs as $doc) {
-
-            $data[] =
-                [
-                    'Document' => $doc->description,
-                    'Number' => $doc->number,
-                ];
-
-        }
+        $data[] =
+            [
+                "IFTTT" => $ifttt,
+                "Maps" => $googleMaps,
+                "Rail" => ($rail+$rail2),
+                "Weather" => $weather
+            ];
 
         $this->table($headers, $data);
     }

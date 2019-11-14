@@ -14,7 +14,7 @@ class CheckLc extends Command
      *
      * @var string
      */
-    protected $signature = 'link:check:lc';
+    protected $signature = 'link:check:lc {--debug}';
 
     /**
      * The console command description.
@@ -41,11 +41,14 @@ class CheckLc extends Command
      */
     public function handle()
     {
+        $debug = $this->option('debug');
         $this->controller->lizzieMorningCommute();
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
-        //die();
-        $this->controller->action = "notification";
-        $this->controller->sendToIffft("L");
+        if (!$debug) {
+            $this->controller->action = "notification";
+            $this->controller->sendToIffft("L");
+        }
+
     }
 }

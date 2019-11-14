@@ -14,7 +14,7 @@ class CheckEW extends Command
      *
      * @var string
      */
-    protected $signature = 'link:check:ew';
+    protected $signature = 'link:check:ew {--debug}';
 
     /**
      * The console command description.
@@ -41,11 +41,15 @@ class CheckEW extends Command
      */
     public function handle()
     {
+
+        $debug = $this->option('debug');
         $this->controller->eveningWeather();
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
         $this->controller->action = "notification";
-        $this->controller->sendToIffft("K");
-        $this->controller->sendToIffft("L");
+        if (!$debug) {
+            $this->controller->sendToIffft("K");
+            $this->controller->sendToIffft("L");
+        }
     }
 }
