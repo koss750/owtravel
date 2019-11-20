@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
             ->between('7:35', '7:55');
         $schedule->command('link:check:lc')
             ->weekdays()
-            ->at('7:45');
+            ->at('8:05');
         $schedule->command('link:check:ew')
             ->dailyAt('21:45');
         $schedule->command('link:check:ew:compare')
