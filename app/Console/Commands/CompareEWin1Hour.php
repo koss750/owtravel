@@ -41,6 +41,9 @@ class CompareEWin1Hour extends Command
      */
     public function handle()
     {
+        $ew = new CheckEW;
+        $ew->handle();
+
         $debug = $this->option('debug');
         $this->controller->oneHourWeather();
         $chanceLater = $this->controller->lineOne["chanceLater"];
