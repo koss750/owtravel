@@ -596,10 +596,10 @@ class LinkHookController extends Controller
 
 
         $this->lineOne = [
-            "intensityNow" => $rainPowerNow*100,
+            "intensityNow" => $rainPowerNow*10000,
             "chanceNow" => $rainChanceNow*100,
             "chanceLater" => $rainChanceLater*100,
-            "intensityLater" => $rainPowerLater*100
+            "intensityLater" => $rainPowerLater*10000
         ];
 
     }

@@ -48,29 +48,27 @@ class CompareEWin1Hour extends Command
         $intNow = $this->controller->lineOne["intensityNow"];
         $intLater = $this->controller->lineOne["intensityLater"];
 
-        if (
+        if ($chanceLater == 0 && $intLater ==0) {
+            $this->controller->lineOne = "Weather report";
+            $this->controller->lineTwo = "No rain in 1 hour";
+        }
+        else if (
             ($chanceNow < $chanceLater) || ($intNow < $intLater)
         ) {
             $this->controller->lineOne = "Good evening! Weather warning!";
             $this->controller->lineTwo = "Chance of rain in 1 hour is getting higher at $chanceLater%. Intensity now is $intNow and will become $intLater";
-            $this->info($this->controller->lineOne);
-            $this->info($this->controller->lineTwo);
-            $this->controller->action = "notification";
-            if (!$debug) {
-                $this->controller->sendToIffft("K");
-                $this->controller->sendToIffft("L");
-            }
         }
         else {
             $this->controller->lineOne = "Good evening. Weather information";
             $this->controller->lineTwo = "Chance of rain in 1 hour is $chanceLater%. Intensity now is $intNow and will become $intLater";
-            $this->controller->action = "notification";
-            $this->info($this->controller->lineOne);
-            $this->info($this->controller->lineTwo);
-            if (!$debug) {
-                $this->controller->sendToIffft("K");
-                $this->controller->sendToIffft("L");
-            }
+        }
+
+        $this->info($this->controller->lineOne);
+        $this->info($this->controller->lineTwo);
+        $this->controller->action = "notification";
+        if (!$debug) {
+            $this->controller->sendToIffft("K");
+            $this->controller->sendToIffft("L");
         }
 
     }
