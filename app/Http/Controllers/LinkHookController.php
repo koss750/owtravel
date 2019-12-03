@@ -567,7 +567,7 @@ class LinkHookController extends Controller
             $this->lineTwo = "At 8am, no rain is expected";
         }
         else {
-            $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity - $rainPower";
+            $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity $rainPower";
         }
 
 
