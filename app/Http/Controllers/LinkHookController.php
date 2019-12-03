@@ -559,10 +559,18 @@ class LinkHookController extends Controller
         $summary = $response->summary;
         $temperature = round(($response->temperature - 32) / 1.8);
         $rainChance = $response->precipProbability*100;
-        $rainPower = $response->precipIntensity*100;
+        $rainPower = $response->precipIntensity*10000;
 
         $this->lineOne = "Good evening! Weather report:";
-        $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity - $rainPower";
+
+        if ($rainPower == 0 && $rainChance ==0) {
+            $this->lineTwo = "At 8am, no rain is expected";
+        }
+        else {
+            $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity - $rainPower";
+        }
+
+
 
     }
 
