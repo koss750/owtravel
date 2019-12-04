@@ -564,11 +564,19 @@ class LinkHookController extends Controller
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At 8am, no rain is expected";
+            $this->lineTwo = "At 8am, no rain is expected. $temperature" . "°C";
         }
         else {
-            $this->lineTwo = "At 8am, it's $summary, $temperature C. $rainChance% rain. Rain intensity $rainPower";
+            $this->lineTwo = "At 8am, it's $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower";
         }
+
+        $logValue = [
+            "temperature" => $temperature,
+            "rain_chance" => $rainChance,
+            "rain_intensity" => $rainPower,
+            "date" => Carbon::today()->toDateString()
+        ];
+        $this->log("historic-information", "morning_weather_forecast", json_encode($logValue));
 
 
 
