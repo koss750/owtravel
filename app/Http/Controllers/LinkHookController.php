@@ -510,11 +510,11 @@ class LinkHookController extends Controller
 
         if ($turn == "turn-right") {
             if ($alternative < 5) {
-                return "Loose Road is only $alternative min slower";
+                return "Loose Road will only delay you $alternative min";
             }
-            return "Dean Street is $alternative min faster";
+            return "Loose Road will delay you by $alternative min";
         }
-        else return "Loose Road is $alternative min faster";
+        else return "Dean Street will delay you by $alternative min";
 
     }
 
