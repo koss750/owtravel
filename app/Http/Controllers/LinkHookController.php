@@ -414,7 +414,7 @@ class LinkHookController extends Controller
         else {
             $trainDeparture = $times["departure_time"];
             $platform = $times["platform"];
-            $atWork = date('H:i', strtotime("$trainDeparture + 32 minutes"));
+            $atWork = date('H:i', strtotime("$trainDeparture + 36 minutes"));
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
         }
