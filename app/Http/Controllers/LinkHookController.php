@@ -393,7 +393,7 @@ class LinkHookController extends Controller
 
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
-        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 20 minutes"));
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 12 minutes"));
 
         $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
@@ -409,14 +409,14 @@ class LinkHookController extends Controller
 
         if ($times == 0) {  //No trains returned by Specific Train hook
             $this->lineOne = "Hello. Roads are $drivingCondition.";
-            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 20 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 12 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
         }
         else {
             $trainDeparture = $times["departure_time"];
             $platform = $times["platform"];
             $atWork = date('H:i', strtotime("$trainDeparture + 36 minutes"));
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
-            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 20 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 12 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
         }
     }
 
