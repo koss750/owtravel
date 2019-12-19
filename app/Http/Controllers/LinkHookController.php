@@ -68,9 +68,12 @@ class LinkHookController extends Controller
                     $this->kossMorningCommute();
                     return $this->sendToIffft("K");
                     break;
-                case "kw":
+                case "kaec":
                     //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
                     return $this->kossEveningCommuteAdvanceNotice();
+                    break;
+                case "kiec":
+                    return $this->kossEveningCommuteAdvanceNotice(0);
                     break;
             }
 
@@ -460,7 +463,7 @@ class LinkHookController extends Controller
         }
     }
 
-    public function kossEveningCommuteAdvanceNotice()
+    public function kossEveningCommuteAdvanceNotice($walkingTime = 27)
     {
 
         $drivingTimes = $this->googleDrivingTime( "ebbsfleet+international", "home");
@@ -469,7 +472,6 @@ class LinkHookController extends Controller
         $trafficRatio = $drivingTimes[2];
 
         $drivingCondition = $this->trafficCondition($trafficRatio);
-        $walkingTime = 27;
         $departingStn = "SPX";
         $arrivalStn = "EBD";
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($walkingTime));
