@@ -494,7 +494,7 @@ class LinkHookController extends Controller
             $this->sendToIffft("K");
             $this->lineOne = "Good evening!";
             $this->lineTwo = "K is about to leave and should get home by $atHome";
-            //$this->sendToIffft("L");
+            $this->sendToIffft("L");
         }
     }
 
