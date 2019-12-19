@@ -469,7 +469,7 @@ class LinkHookController extends Controller
         $trafficRatio = $drivingTimes[2];
 
         $drivingCondition = $this->trafficCondition($trafficRatio);
-        $walkingTime = 17;
+        $walkingTime = 27;
         $departingStn = "SPX";
         $arrivalStn = "EBD";
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($walkingTime));
@@ -490,6 +490,9 @@ class LinkHookController extends Controller
             $this->lineOne = "Good evening creator.";
             $this->lineTwo = "You should make the $trainDeparture train (platform $platform). Roads are $drivingCondition, will take $drivingTime min to drive home, getting you there at $atHome";
             $this->sendToIffft("K");
+            $this->lineOne = "Good evening!";
+            $this->lineTwo = "K is about to leave and should get home by $atHome";
+            //$this->sendToIffft("L");
         }
     }
 
