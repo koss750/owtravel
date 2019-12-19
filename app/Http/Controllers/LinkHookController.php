@@ -19,6 +19,7 @@ class LinkHookController extends Controller
     public $client;
     public $lineOne;
     public $lineTwo;
+    public $spareVariable;
 
 
     public function index($action, $hook) {
@@ -418,6 +419,7 @@ class LinkHookController extends Controller
             $trainDeparture = $times["departure_time"];
             $platform = $times["platform"];
             $atWork = date('H:i', strtotime("$trainDeparture + 36 minutes"));
+            $this->spareVariable = $atWork;
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 12 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
         }

@@ -27,7 +27,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('link:check:kc')
             ->weekdays()
             ->everyFiveMinutes()
-            ->between('7:05', '7:35');
+            ->between('7:04', '7:36');
+        $schedule->command('link:check:lww')
+            ->weekdays()
+            ->everyTenMinutes()
+            ->between('6:50', '7:41');
+        $schedule->command('link:check:kc')
+        ->weekdays()
+        ->everyFiveMinutes()
+        ->between('7:05', '7:35');
         $schedule->command('link:check:lc')
             ->weekdays()
             ->at('8:05');
