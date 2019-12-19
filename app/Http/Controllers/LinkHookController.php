@@ -489,12 +489,16 @@ class LinkHookController extends Controller
             $trainArrival = $times["arrival_time"];
             $platform = $times["platform"];
             $atHome = date('H:i', strtotime("$trainArrival + $drivingTime minutes"));
-            $this->lineOne = "Good evening creator.";
-            $this->lineTwo = "You should make the $trainDeparture train (platform $platform). Roads are $drivingCondition, will take $drivingTime min to drive home, getting you there at $atHome";
-            $this->sendToIffft("K");
-            $this->lineOne = "Good evening!";
-            $this->lineTwo = "K is about to leave and should get home by $atHome";
-            $this->sendToIffft("L");
+            if ($walkingTime>0) {
+                $this->lineOne = "Good evening creator.";
+                $this->lineTwo = "You should make the $trainDeparture train (platform $platform). Roads are $drivingCondition, will take $drivingTime min to drive home, getting you there at $atHome";
+                $this->sendToIffft("K");
+            }
+            else {
+                $this->lineOne = "Good evening!";
+                $this->lineTwo = "K is about to leave and should get home by $atHome";
+                $this->sendToIffft("L");
+            }
         }
     }
 
