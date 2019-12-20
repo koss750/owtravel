@@ -76,6 +76,10 @@ class LinkHookController extends Controller
                 case "kiec":
                     return $this->kossEveningCommuteAdvanceNotice(0);
                     break;
+                case "k_ebbs_pm":
+                    if (!$this->debug) $this->dieOfCurfew(['13', '23'], ['Sat', 'Sun']);
+                    return $this->arrivedToEbbsfleetPM();
+                    break;
             }
 
         }
@@ -433,35 +437,22 @@ class LinkHookController extends Controller
         $trafficRatio = $drivingTimes[2];
 
         $drivingCondition = $this->trafficCondition($trafficRatio);
-        $walkingTime = 10;
+        $walkingTime = 11;
 
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
-        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 5 minutes"));
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
 
         $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
 
-        $departingStn = "EBD";
-        $arrivalStn = "SPX";
-        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
-        $mainResponse = json_decode($mainResponse);
-        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
+        $this->lineOne = "Welcome to Ebbsfleet! Home ETA $arrivalTime";
+        $this->lineTwo = "Roads are $drivingCondition. It will take you $drivingTime minutes to get home with ETA at $arrivalTime.";
+        $this->sendToIffft("K");
 
-        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
-        else $times = 0;
-
-        if ($times == 0) {  //No trains returned by Specific Train hook
-            $this->lineOne = "Hello. Roads are $drivingCondition.";
-            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 5 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
-        }
-        else {
-            $trainDeparture = $times["departure_time"];
-            $platform = $times["platform"];
-            $arrivalTime = date('H:i', strtotime("$trainDeparture + 19 minutes"));
-            $this->lineOne = "Good morning. Roads are $drivingCondition.";
-            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 5 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at St.P at around $arrivalTime";
-        }
+        $this->lineOne = "ETA $arrivalTime";
+        $this->lineTwo = "K arrived to Ebbsfleet. His updated ETA is $arrivalTime";
+        $this->sendToIffft("L");
 
     }
 
