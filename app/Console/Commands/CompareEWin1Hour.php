@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\LinkHookController;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CompareEWin1Hour extends Command
@@ -42,25 +43,34 @@ class CompareEWin1Hour extends Command
     public function handle()
     {
         $debug = $this->option('debug');
-        $this->controller->oneHourWeather();
-        $chanceLater = $this->controller->lineOne["chanceLater"];
-        $chanceNow = $this->controller->lineOne["chanceNow"];
-        $intNow = $this->controller->lineOne["intensityNow"];
-        $intLater = $this->controller->lineOne["intensityLater"];
+        $starting = Carbon::now();
 
-        if ($chanceLater == 0 && $intLater ==0) {
-            $this->controller->lineOne = "Weather report";
-            $this->controller->lineTwo = "No rain in 1 hour";
+        $this->controller->oneHourWeather($starting);
+        $chanceLater[0] = $this->controller->lineOne["chanceLater"];
+        $intLater[0] = $this->controller->lineOne["intensityLater"];
+
+        $this->controller->oneHourWeather($starting->addHour(1));
+        $chanceLater[1] = $this->controller->lineOne["chanceLater"];
+        $intLater[1] = $this->controller->lineOne["intensityLater"];
+
+        $rainIndex1h = $chanceLater[0]*$intLater[0];
+        $rainIndex2h = $chanceLater[1]*$intLater[1];
+
+        if ($rainIndex2h == $rainIndex1h && $rainIndex1h == 0) {
+            $this->controller->lineOne = "Good evening! Weather update";
+            $this->controller->lineTwo = "No rain at 9pm and 10pm";
         }
-        else if (
-            ($chanceNow < $chanceLater) || ($intNow < $intLater)
-        ) {
-            $this->controller->lineOne = "Good evening! Weather warning!";
-            $this->controller->lineTwo = "Chance of rain in 1 hour is getting higher at $chanceLater%. Intensity now is $intNow and will become $intLater";
+        else if ($rainIndex2h == 0) {
+            $this->controller->lineOne = "Good evening! Weather update";
+            $this->controller->lineTwo = "9pm - $chanceLater[0]%, int.$intLater[0]. No rain at 10pm";
+        }
+        else if ($rainIndex1h == 0) {
+            $this->controller->lineOne = "Good evening! Weather update";
+            $this->controller->lineTwo = "No rain at 9pm. 10pm - $chanceLater[1]%, int. $intLater[1]";
         }
         else {
-            $this->controller->lineOne = "Good evening. Weather information";
-            $this->controller->lineTwo = "Chance of rain in 1 hour is $chanceLater%. Intensity now is $intNow and will become $intLater";
+            $this->controller->lineOne = "Good evening! Weather warning";
+            $this->controller->lineTwo = "9pm - $chanceLater[0]%, int.$intLater[0]. 10pm - $chanceLater[1]%, int. $intLater[1]";
         }
 
         $this->info($this->controller->lineOne);

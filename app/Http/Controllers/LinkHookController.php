@@ -425,6 +425,46 @@ class LinkHookController extends Controller
         }
     }
 
+    public function arrivedToEbbsfleetPM() {
+
+        $drivingTimes = $this->compareDrivingTimes( "ebbsfleet+international", "home", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
+
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 10;
+
+        $commuteTime = $walkingTime+$drivingTime;
+        $timeNow = now();
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 5 minutes"));
+
+        $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
+        $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
+
+        $departingStn = "EBD";
+        $arrivalStn = "SPX";
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
+        $mainResponse = json_decode($mainResponse);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
+
+        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
+        else $times = 0;
+
+        if ($times == 0) {  //No trains returned by Specific Train hook
+            $this->lineOne = "Hello. Roads are $drivingCondition.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 5 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
+        }
+        else {
+            $trainDeparture = $times["departure_time"];
+            $platform = $times["platform"];
+            $arrivalTime = date('H:i', strtotime("$trainDeparture + 19 minutes"));
+            $this->lineOne = "Good morning. Roads are $drivingCondition.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 5 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at St.P at around $arrivalTime";
+        }
+
+    }
+
     public function goingToLondonViaEbbsfleet()
     {
 
@@ -633,8 +673,8 @@ class LinkHookController extends Controller
 
     }
 
-    public function oneHourWeather() {
-        $date = Carbon::now()->addHour(1)->startOfHour()->toDateTimeString();
+    public function oneHourWeather($startingTime) {
+        $date = $startingTime->addHour(1)->startOfHour()->toDateTimeString();
         $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date,'Europe/London');
         $timestamp = $carbon_obj->timestamp;
 
