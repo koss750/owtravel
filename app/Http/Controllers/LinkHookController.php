@@ -431,7 +431,7 @@ class LinkHookController extends Controller
 
     public function arrivedToEbbsfleetPM() {
 
-        $drivingTimes = $this->compareDrivingTimes( "ebbsfleet+international", "home", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
+        $drivingTimes = $this->googleDrivingTime( "ebbsfleet+international", "home");
 
         $drivingTime = $drivingTimes[1];
         $trafficRatio = $drivingTimes[2];
@@ -442,9 +442,6 @@ class LinkHookController extends Controller
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
         $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes"));
-
-        $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
-        $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
 
         $this->lineOne = "Welcome to Ebbsfleet! Home ETA $arrivalTime";
         $this->lineTwo = "Roads are $drivingCondition. It will take you $drivingTime minutes to get home with ETA at $arrivalTime.";
