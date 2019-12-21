@@ -626,7 +626,19 @@ class LinkHookController extends Controller
 
     public function eveningWeather() {
         $date = today()->addDay(1)->toDateString();
-        $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date . '08:00:00','Europe/London');
+        $dayToday = date("D");
+
+        if ($dayToday == "Fri" || $dayToday == "Sat") {
+            $targetTime = "09:30";
+            $targetHourString = "9.30am";
+        }
+        else {
+            $targetTime = "08:00";
+            $targetHourString = "8am";
+        }
+
+        $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date . $targetTime . ':00','Europe/London');
+
         $timestamp = $carbon_obj->timestamp;
 
         $hook = $this->hookUp("DARK_SKY", [
@@ -643,10 +655,10 @@ class LinkHookController extends Controller
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At 8am, no rain is expected. $temperature" . "°C";
+            $this->lineTwo = "At $targetHourString, no rain is expected. $temperature" . "°C";
         }
         else {
-            $this->lineTwo = "At 8am, it's $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower";
+            $this->lineTwo = "At $targetHourString, it's $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower";
         }
 
         $logValue = [
