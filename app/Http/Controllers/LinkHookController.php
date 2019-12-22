@@ -647,18 +647,22 @@ class LinkHookController extends Controller
         );
 
         $response = $hook->objectResponse->currently;
+        $dailyData = $hook->objectResponse->daily->data[0];
         $summary = $response->summary;
         $temperature = round(($response->temperature - 32) / 1.8);
         $rainChance = $response->precipProbability*100;
         $rainPower = $response->precipIntensity*10000;
+        $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');
+
 
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At $targetHourString, no rain is expected. $temperature" . "°C";
+            $this->lineTwo = "At $targetHourString, no rain is expected. $temperature" . "°C. Sunrise $sunrise";
         }
         else {
-            $this->lineTwo = "At $targetHourString, it's $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower";
+            $worstRain = Carbon::createFromTimestamp($dailyData->precipIntensityMaxTime)->format('g:i A');
+            $this->lineTwo = "At $targetHourString, it's $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Sunrise $sunrise";
         }
 
         $logValue = [
