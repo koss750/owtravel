@@ -445,6 +445,7 @@ class LinkHookController extends Controller
             $this->lineOne = "Good morning and welcome to Ebbsfleet";
             $this->lineTwo = "You should make the $trainDeparture train on platform $platform. Work ETA - $atWork";
         }
+        $this->sendToIffft("K");
     }
 
     public function arrivedToEbbsfleetPM() {
