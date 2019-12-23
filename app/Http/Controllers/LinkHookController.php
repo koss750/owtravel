@@ -66,8 +66,12 @@ class LinkHookController extends Controller
                     return $this->kossEveningCommuteAdvanceNotice(0);
                     break;
                 case "k_ebbs_pm":
-                    if (!$this->debug) $this->dieOfCurfew(['13', '23'], ['Sat', 'Sun']);
+                    if (!$this->debug) $this->dieOfCurfew(['14', '23']);
                     return $this->arrivedToEbbsfleetPM();
+                    break;
+                case "k_ebbs_am":
+                    if (!$this->debug) $this->dieOfCurfew(['7', '14']);
+                    return $this->arrivedToEbbsfleetAM();
                     break;
             }
 
@@ -75,7 +79,7 @@ class LinkHookController extends Controller
 
     }
 
-    public function dieOfCurfew($time, $days, $actions = [])
+    public function dieOfCurfew($time, $days = [], $actions = [])
     {
         if (!$this->debug) {
             $timeNow = date("H");
@@ -415,6 +419,31 @@ class LinkHookController extends Controller
             $this->spareVariable = $atWork;
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 12 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at work at around $atWork";
+        }
+    }
+
+    public function arrivedToEbbsfleetAM() {
+
+        $departingStn = "EBD";
+        $arrivalStn = "SPX";
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, (6));
+        $mainResponse = json_decode($mainResponse);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
+
+        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
+        else $times = 0;
+
+        if ($times == 0) {  //No trains returned by Specific Train hook
+            $this->lineOne = "Welcome to Ebbsfleet, Creator.";
+            $this->lineTwo = "No trains are departing it seems, sorry if it's true..";
+        }
+        else {
+            $trainDeparture = $times["departure_time"];
+            $platform = $times["platform"];
+            $atWork = date('H:i', strtotime("$trainDeparture + 36 minutes"));
+            $this->spareVariable = $atWork;
+            $this->lineOne = "Good morning and welcome to Ebbsfleet";
+            $this->lineTwo = "You should make the $trainDeparture train on platform $platform. Work ETA - $atWork";
         }
     }
 
