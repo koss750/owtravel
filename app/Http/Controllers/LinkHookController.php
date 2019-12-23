@@ -47,33 +47,22 @@ class LinkHookController extends Controller
 
             $this->hook = $hook;
             switch ($hook) {
-                case "we":
-                //    if (!$this->debug) $this->dieOfCurfew(['15', '21'], ['Sat', 'Sun']);
-                    return $this->waterlooEast();
-                    break;
-                case "pw":
-                //    if (!$this->debug) $this->dieOfCurfew(['16', '22'], ['Sat', 'Sun']);
-                    return $this->paddockWood();
-                    break;
-                case "wu":
-                //    if (!$this->debug) $this->dieOfCurfew(['6', '23'], ['Sat', 'Sun'], ['text']);
-                    return $this->wakeUp();
-                    break;
                 case "lc":
-                //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
+                    if (!$this->debug) $this->dieOfCurfew(['6', '11'], ['Sat', 'Sun']);
                     $this->lizzieMorningCommute();
                     return $this->sendToIffft("L");
                     break;
                 case "kc":
-                //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
+                    if (!$this->debug) $this->dieOfCurfew(['6', '10'], ['Sat', 'Sun']);
                     $this->kossMorningCommute();
                     return $this->sendToIffft("K");
                     break;
                 case "kaec":
-                    //    if (!$this->debug) $this->dieOfCurfew(['5', '23'], ['Sat', 'Sun']);
+                    if (!$this->debug) $this->dieOfCurfew(['13', '19'], ['Sat', 'Sun']);
                     return $this->kossEveningCommuteAdvanceNotice();
                     break;
                 case "kiec":
+                    if (!$this->debug) $this->dieOfCurfew(['13', '20'], ['Sat', 'Sun']);
                     return $this->kossEveningCommuteAdvanceNotice(0);
                     break;
                 case "k_ebbs_pm":
