@@ -93,18 +93,18 @@ class LinkHookController extends Controller
             $dayNow = date("D");
 
             if ($timeNow < $time[0] || $timeNow > $time[1]) {
-                abort(403, "$timeNow:00 outside working hours");
+                abort(425, "$timeNow:00 outside working hours");
             }
 
             foreach ($days as $day) {
                 if ($day == $dayNow) {
-                    abort(403, "$day outside working days");
+                    abort(425, "$day outside working days");
                 }
             }
 
             foreach ($actions as $action) {
                 if ($action == $this->action) {
-                    abort(403, "$this->hook incompatable with $this->action");
+                    abort(400, "$this->hook incompatable with $this->action");
                 }
             }
         }
