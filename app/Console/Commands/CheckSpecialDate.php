@@ -46,13 +46,13 @@ class CheckSpecialDate extends Command
 
         $debug = $this->option('debug');
         $date = Carbon::now();
-        $timeString = $date->format('d m y');
+        $timeString = $date->format('dmy');
 
         $this->controller->lineOne = "A special message from your smart home";
         $this->controller->lineTwo = "[no message]";
         $this->controller->action = "[no action]";
 
-        if ($timeString == "01 01 20") {
+        if ($timeString == "010120") {
             $specialOccasion = true;
             $this->controller->lineOne = "A special message from your smart home";
             $this->controller->lineTwo = "Happy New Year!!! Let 2020 be great";

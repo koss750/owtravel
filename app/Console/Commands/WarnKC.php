@@ -43,6 +43,10 @@ class WarnKC extends Command
     public function handle()
     {
         $debug = $this->option('debug');
+        if ($this->controller->checkWeekendRegimeToday()) {
+            $this->info("Today is instructed to be a weekend regime day. Skipping operation");
+            return;
+        }
         $this->controller->kossMorningCommute();
         $workBegins = Carbon::createFromTimeString("9:10");
         $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);

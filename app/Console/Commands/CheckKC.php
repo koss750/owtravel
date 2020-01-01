@@ -42,6 +42,10 @@ class CheckKC extends Command
     public function handle()
     {
         $debug = $this->option('debug');
+        if ($this->controller->checkWeekendRegimeToday()) {
+            $this->info("Today is instructed to be a weekend regime day. Skipping operation");
+            return;
+        }
         $times = $this->controller->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
         $this->info("Drive: " . $times[1]);
         if($times[1]>49 && !$debug) {

@@ -42,6 +42,10 @@ class CheckLc extends Command
     public function handle()
     {
         $debug = $this->option('debug');
+        if ($this->controller->checkWeekendRegimeToday()) {
+            $this->info("Today is instructed to be a weekend regime day. Skipping operation");
+            return;
+        }
         $this->controller->lizzieMorningCommute();
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);

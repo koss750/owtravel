@@ -802,6 +802,16 @@ class LinkHookController extends Controller
         $log->save();
     }
 
+    public function checkWeekendRegimeToday() {
+        $date = Carbon::now();
+        $timeString = $date->format('dmy');
+        return $this->checkRoutineInformation('weekend-regime', $timeString);
+    }
+
+    public function checkRoutineInformation($subtype, $value) {
+        return LinkLog::where('type', 'routine-information')->where('subtype', $subtype)->where('value', $value)->exists();
+    }
+
 
 //////
 ///
