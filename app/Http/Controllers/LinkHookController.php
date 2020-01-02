@@ -643,6 +643,13 @@ class LinkHookController extends Controller
         //[4] traffic conditions
     }
 
+    public function endOfWeek() {
+        $week = today()->format('wo');
+        $year = today()->format('YYYY');
+        $this->lineOne = "Happy Friday!";
+        $this->lineTwo = "It's the end of the $week week of $year. Have a good weekend!";
+    }
+
     public function eveningWeather() {
         $date = today()->addDay(1)->toDateString();
         $dayToday = date("D");
