@@ -48,7 +48,7 @@ class WarnKC extends Command
             return;
         }
         $this->controller->kossMorningCommute();
-        $workBegins = Carbon::createFromTimeString("9:10");
+        $workBegins = Carbon::createFromTimeString("9:30");
         $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);
 
         if ($estimatedArrival->gt($workBegins) && !$debug) {
