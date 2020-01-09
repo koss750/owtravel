@@ -376,7 +376,7 @@ class LinkHookController extends Controller
         $this->lineTwo = "It will take you $drivingTime minutes to get to Fremlin walk. $directions";
     }
 
-    public function kossMorningCommute()
+    public function kossMorningCommute($offset = 12)
     {
 
         $drivingTimes = $this->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
@@ -389,7 +389,7 @@ class LinkHookController extends Controller
 
         $commuteTime = $walkingTime+$drivingTime;
         $timeNow = now();
-        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + 12 minutes"));
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + $offset minutes"));
 
         $slowerBy = ($drivingTimes["alternative"]-$drivingTime);
         $directions = $this->processHeathRoadTurn($drivingTimes[3], $slowerBy);
@@ -405,7 +405,7 @@ class LinkHookController extends Controller
 
         if ($times == 0) {  //No trains returned by Specific Train hook
             $this->lineOne = "Hello. Roads are $drivingCondition.";
-            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in 12 minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
+            $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet and if you leave in $offset minutes you'll get there at $arrivalTime. However, no trains will be leaving $departingStn then.";
         }
         else {
             $trainDeparture = $times["departure_time"];
