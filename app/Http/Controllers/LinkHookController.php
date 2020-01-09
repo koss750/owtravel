@@ -513,8 +513,6 @@ class LinkHookController extends Controller
         $drivingTimes = $this->googleDrivingTime("home", "marden+station");
         $drivingTime = $drivingTimes[1];
         $trafficRatio = $drivingTimes[2];
-
-        $drivingCondition = $this->trafficCondition($trafficRatio);
         $walkingTime = 2;
 
         $commuteTime = $walkingTime+$drivingTime;
@@ -525,17 +523,15 @@ class LinkHookController extends Controller
         $arrivalStn = "CHX";
         $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($commuteTime+$offset));
         $mainResponse = json_decode($mainResponse);
-        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [2]);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [null, 1, 2]);
 
-        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
-        else return 0;
+        $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
 
         $trainDeparture = $times["departure_time"];
         $trainArrival = $times["arrival_time"];
-        $platform = $times["platform"];
         $atWork = date('H:i', strtotime("$trainArrival + 16 minutes"));
         $this->spareVariable = $atWork;
-        $this->lineSpare = "Alternatively, it will take you $drivingTime minutes to get to Marden. If you leave in $offset minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. This places you at work at around $atWork";
+        $this->lineSpare = "Alternatively, it will take you $drivingTime minutes to get to Marden. You should be in time for $trainDeparture train, work ETA $atWork";
     }
 
     public function kossEveningCommuteAdvanceNotice($walkingTime = 27)

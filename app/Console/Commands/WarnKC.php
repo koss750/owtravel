@@ -54,7 +54,7 @@ class WarnKC extends Command
         if ($estimatedArrival->gt($workBegins) && !$debug) {
             $this->controller->kossAlternativeCommute(22);
             $this->controller->lineOne = "LATE TO WORK WARNING";
-            $this->controller->lineTwo .= $this->controller->lineSpare;
+            $this->controller->lineTwo .= ". " . $this->controller->lineSpare;
             $this->controller->action = "notification";
 
             $this->controller->sendToIffft("K");
@@ -65,6 +65,15 @@ class WarnKC extends Command
                 "estimatedArrival" => $estimatedArrival
             ];
             $this->controller->log("historic-information", "late-to-work-prediction", json_encode($logValue));
+        }
+
+        else if ($debug) {
+            $this->controller->kossAlternativeCommute(22);
+            $this->controller->lineOne = "LATE TO WORK WARNING";
+            $this->controller->lineTwo .= ". " . $this->controller->lineSpare;
+
+            $this->info($this->controller->lineOne);
+            $this->info($this->controller->lineTwo);
         }
     }
 }
