@@ -19,6 +19,7 @@ class LinkHookController extends Controller
     public $client;
     public $lineOne;
     public $lineTwo;
+    public $lineSpare;
     public $spareVariable;
 
 
@@ -487,7 +488,7 @@ class LinkHookController extends Controller
 
         $departingStn = "EBD";
         $arrivalStn = "SPX";
-        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+5));
         $mainResponse = json_decode($mainResponse);
         $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
 
@@ -505,6 +506,36 @@ class LinkHookController extends Controller
             $this->lineOne = "Good morning. Roads are $drivingCondition.";
             $this->lineTwo = "It will take you $drivingTime minutes to get to Ebbsfleet. If you leave in 5 minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. $directions This places you at St.P at around $arrivalTime";
         }
+    }
+
+    public function kossAlternativeCommute($offset = 12) {
+
+        $drivingTimes = $this->googleDrivingTime("home", "marden+station");
+        $drivingTime = $drivingTimes[1];
+        $trafficRatio = $drivingTimes[2];
+
+        $drivingCondition = $this->trafficCondition($trafficRatio);
+        $walkingTime = 2;
+
+        $commuteTime = $walkingTime+$drivingTime;
+        $timeNow = now();
+        $arrivalTime = date('H:i', strtotime("$timeNow + $commuteTime minutes + $offset minutes"));
+
+        $departingStn = "MRN";
+        $arrivalStn = "CHX";
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($commuteTime+$offset));
+        $mainResponse = json_decode($mainResponse);
+        $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [2]);
+
+        if ($nextTrainFromPlatform) $times = $this->nationalRailSpecificTrain($nextTrainFromPlatform, $departingStn, $arrivalStn);
+        else return 0;
+
+        $trainDeparture = $times["departure_time"];
+        $trainArrival = $times["arrival_time"];
+        $platform = $times["platform"];
+        $atWork = date('H:i', strtotime("$trainArrival + 16 minutes"));
+        $this->spareVariable = $atWork;
+        $this->lineSpare = "Alternatively, it will take you $drivingTime minutes to get to Marden. If you leave in $offset minutes, you should be on platform $platform at $arrivalTime and in time for $trainDeparture train. This places you at work at around $atWork";
     }
 
     public function kossEveningCommuteAdvanceNotice($walkingTime = 27)

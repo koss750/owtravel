@@ -52,7 +52,9 @@ class WarnKC extends Command
         $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);
 
         if ($estimatedArrival->gt($workBegins) && !$debug) {
+            $this->controller->kossAlternativeCommute(22);
             $this->controller->lineOne = "LATE TO WORK WARNING";
+            $this->controller->lineTwo .= $this->controller->lineSpare;
             $this->controller->action = "notification";
 
             $this->controller->sendToIffft("K");
