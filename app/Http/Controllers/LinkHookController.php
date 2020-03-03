@@ -642,10 +642,10 @@ class LinkHookController extends Controller
     }
 
     public function endOfWeek() {
-        $week = (int)today()->format('W') . date( 'S' , (int)today()->format('W')); //needs massive improvement, terrible method
+        $week = (int)today()->format('W');
         $year = today()->format('Y');
         $this->lineOne = "Happy Friday!";
-        $this->lineTwo = "It's the end of the $week week of $year. Have a good weekend!";
+        $this->lineTwo = "It's the end of week $week of $year. Have a good weekend!";
     }
 
     public function eveningWeather() {
