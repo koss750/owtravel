@@ -48,10 +48,11 @@ class CheckKC extends Command
             return;
         }
         $this->controller->kossCompareCommutes();
+        $times = $this->controller->spareVariable;
         $difference = ($this->controller->processKossCommuteTimeDifference());
         $this->controller->kossMorningCommute();
 
-        $this->controller->lineOne = "Good morning creator. Don't be late!";
+        $this->controller->lineOne = "Good morning! $times[0] $times[1]";
         $this->controller->lineTwo .= " Alternative route ";
         if ($difference<0) {
             $this->controller->kossAlternativeCommute();
@@ -63,7 +64,7 @@ class CheckKC extends Command
         }
         else $this->controller->lineTwo .= "has the same ETA";
 
-        $workBegins = Carbon::createFromTimeString("9:44");
+        $workBegins = Carbon::createFromTimeString("9:24");
         $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);
         $runningLate = $estimatedArrival->gt($workBegins);
 
