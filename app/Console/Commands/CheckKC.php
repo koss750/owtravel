@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\LinkHookController;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class CheckKC extends Command
@@ -46,12 +47,30 @@ class CheckKC extends Command
             $this->info("Today is instructed to be a weekend regime day. Skipping operation");
             return;
         }
-        $times = $this->controller->compareDrivingTimes("home", "ebbsfleet+international", "&waypoints=via:Dean+street+maidstone", "&waypoints=via:loose+road+maidstone");
-        $this->info("Drive: " . $times[1]);
-        if($times[1]>49 && !$debug) {
-            $this->controller->kossMorningCommute();
-            $this->controller->lineOne = "Good morning creator. Commute Issue. ";
-            $this->controller->action = "notification";
+        $this->controller->kossCompareCommutes();
+        $difference = ($this->controller->processKossCommuteTimeDifference());
+        $this->controller->kossMorningCommute();
+
+        $this->controller->lineOne = "Good morning creator. Don't be late!";
+        $this->controller->lineTwo .= " Alternative route ";
+        if ($difference<0) {
+            $this->controller->kossAlternativeCommute();
+            $this->controller->lineTwo .= "$difference minutes faster. " . $this->controller->lineSpare;
+        }
+        else if ($difference>0) {
+            $this->controller->kossAlternativeCommute();
+            $this->controller->lineTwo .= "$difference minutes slower. " . $this->controller->lineSpare;
+        }
+        else $this->controller->lineTwo .= "has the same ETA";
+
+        $workBegins = Carbon::createFromTimeString("9:44");
+        $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);
+        $runningLate = $estimatedArrival->gt($workBegins);
+
+        $this->info($this->controller->lineOne);
+        $this->info($this->controller->lineTwo);
+        $this->controller->action = "notification";
+        if (!$debug && $runningLate) {
             $this->controller->sendToIffft("K");
         }
     }

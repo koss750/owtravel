@@ -397,7 +397,7 @@ class LinkHookController extends Controller
 
         $departingStn = "EBD";
         $arrivalStn = "SPX";
-        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+20));
+        $mainResponse = $this->nationalRailStationLive($departingStn, $arrivalStn, ($drivingTime+$walkingTime+$offset));
         $mainResponse = json_decode($mainResponse);
         $nextTrainFromPlatform = $this->nationalRailNextFromPlatform($mainResponse, [5, 2]);
 
@@ -531,8 +531,27 @@ class LinkHookController extends Controller
         $trainArrival = $times["arrival_time"];
         $atWork = date('H:i', strtotime("$trainArrival + 16 minutes"));
         $this->spareVariable = $atWork;
-        $this->lineSpare = "Alternatively, it will take you $drivingTime minutes to get to Marden. You should be in time for $trainDeparture train, work ETA $atWork";
+        $this->lineSpare = "It will take you $drivingTime minutes to get to Marden. You should be in time for $trainDeparture train, work ETA $atWork";
     }
+
+    public function kossCompareCommutes($offset = 12) {
+        $this->kossMorningCommute($offset);
+        $defaultArrival = $this->spareVariable;
+        $this->kossAlternativeCommute($offset);
+        $alternativeArrival = $this->spareVariable;
+        $this->spareVariable = [$defaultArrival, $alternativeArrival];
+    }
+
+    public function processKossCommuteTimeDifference() {
+
+        $first = Carbon::parse($this->spareVariable[0]);
+        $second = Carbon::parse($this->spareVariable[1]);
+        $difference = $first->diffInMinutes($second);
+        if ($first->greaterThan($second)) return -$difference;
+        else return $difference;
+
+    }
+
 
     public function kossEveningCommuteAdvanceNotice($walkingTime = 27)
     {
