@@ -6,6 +6,7 @@ use App\Link;
 use App\LinkHook;
 use App\LinkLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 class LinkHookController extends Controller
@@ -57,6 +58,10 @@ class LinkHookController extends Controller
                     if (!$this->debug) $this->dieOfCurfew(['6', '10'], ['Sat', 'Sun']);
                     $this->kossMorningCommute();
                     return $this->sendToIffft("K");
+                    break;
+                case "off_bed":
+                    if (!$this->debug) $this->dieOfCurfew(['6', '11'], ['Sat', 'Sun']);
+                    Artisan::call('link:check:kc');
                     break;
                 case "kaec":
                     if (!$this->debug) $this->dieOfCurfew(['13', '19'], ['Sat', 'Sun']);
