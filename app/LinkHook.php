@@ -48,7 +48,7 @@ class LinkHook extends BaseModel
             if ($this->debug) echo ($this->url . "<br>");
         } catch (\Exception $e) {
             if ($this->debug) report($e);
-            else abort (500, "Failed inserting params into hook url");
+            else abort (500, "Failed inserting params into $this->type hook url");
 	    }
 
 	    $hashKey = substr(md5($this->url), 0, 8);
@@ -59,7 +59,7 @@ class LinkHook extends BaseModel
                 return $response->getBody()->getContents();
             } catch (\Exception $e) {
                 if ($this->debug) report($e);
-                else abort (500, "Could not get response from hook");
+                else abort (500, "Could not get response from $this->type hook");
                 return 0;
             }
         });
