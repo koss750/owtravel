@@ -52,7 +52,11 @@ class CheckKC extends Command
         $difference = ($this->controller->processKossCommuteTimeDifference());
         $this->controller->kossMorningCommute();
 
-        $this->controller->lineOne = "Good morning! $times[0] $times[1]";
+        $first = Carbon::parse($times[0]);
+        $second = Carbon::parse($times[1]);
+        if (!$first->gt($second)) $this->controller->lineOne = "Long drive recommended. $times[0] $times[1] (-$difference min)";
+        else $this->controller->lineOne = "Short drive recommended. $times[0] $times[1] (+$difference min)";
+
         $this->controller->lineTwo .= " Alternative route ";
         if ($difference<0) {
             $this->controller->kossAlternativeCommute();
