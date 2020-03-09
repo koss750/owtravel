@@ -68,7 +68,7 @@ class CheckKC extends Command
         }
         else $this->controller->lineTwo .= "has the same ETA";
 
-        $workBegins = Carbon::createFromTimeString("9:24");
+        $workBegins = Carbon::createFromTimeString("9:20");
         $estimatedArrival = Carbon::createFromTimeString($this->controller->spareVariable);
         $runningLate = $estimatedArrival->gt($workBegins);
 
