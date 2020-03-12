@@ -60,7 +60,7 @@ class LinkHookController extends Controller
                     return $this->sendToIffft("K");
                     break;
                 case "off_bed":
-                    if (!$this->debug) $this->dieOfCurfew(['6', '11'], ['Sat', 'Sun']);
+                    if (!$this->debug) $this->dieOfCurfew(['6', '9'], ['Sat', 'Sun']);
                     Artisan::call('link:check:kc');
                     break;
                 case "kaec":
