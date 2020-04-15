@@ -658,12 +658,12 @@ class LinkHookController extends Controller
         $dayToday = date("D");
 
         if ($dayToday == "Fri" || $dayToday == "Sat") {
-            $targetTime = "09:30";
-            $targetHourString = "9.30am";
+            $targetTime = "05:30";
+            $targetHourString = "5.30am";
         }
         else {
-            $targetTime = "08:00";
-            $targetHourString = "8am";
+            $targetTime = "05:30";
+            $targetHourString = "5.30am";
         }
 
         $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date . $targetTime . ':00','Europe/London');
