@@ -688,7 +688,7 @@ class LinkHookController extends Controller
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At $targetHourString $temperature" . "°C, no rain is expected . Sunrise $sunrise. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
+            $this->lineTwo = "At $targetHourString $temperature" . "°C, no rain is expected. Sunrise $sunrise. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
         }
         else {
             $worstRain = Carbon::createFromTimestamp($dailyData->precipIntensityMaxTime)->format('g:i A');
