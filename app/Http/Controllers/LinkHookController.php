@@ -682,8 +682,8 @@ class LinkHookController extends Controller
         $rainChance = $response->precipProbability*100;
         $rainPower = $response->precipIntensity*10000;
         $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');    
-        $maxTemp = round(($response->temperatureMax - 32) / 1.8);   
-        $maxTempTime = Carbon::createFromTimestamp($dailyData->temperatureMax)->format('g:i');
+        $maxTemp = round(($response->temperatureHigh - 32) / 1.8);   
+        $maxTempTime = Carbon::createFromTimestamp($dailyData->temperatureHigh)->format('g:i');
 
         $this->lineOne = "Good evening! Weather report:";
 
