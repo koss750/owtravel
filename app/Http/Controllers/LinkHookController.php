@@ -648,9 +648,10 @@ class LinkHookController extends Controller
 
     public function endOfWeek() {
         $week = (int)today()->format('W');
+        $arianaAge = $week-12;
         $year = today()->format('Y');
         $this->lineOne = "Happy Friday!";
-        $this->lineTwo = "It's the end of week $week of $year. Have a good weekend!";
+        $this->lineTwo = "It's the end of week $week of $year. Ariana is $arianaAge weeks old! Have a good weekend!";
     }
 
     public function eveningWeather() {
@@ -682,13 +683,14 @@ class LinkHookController extends Controller
         $rainChance = $response->precipProbability*100;
         $rainPower = $response->precipIntensity*10000;
         $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');    
-        $maxTemp = round(($dailyData->temperatureHigh - 32) / 1.8);   
+        $sunset = Carbon::createFromTimestamp($dailyData->sunsetTime)->format('g:i');
+        $maxTemp = round(($dailyData->temperatureHigh - 32) / 1.8);
         $maxTempTime = Carbon::createFromTimestamp($dailyData->temperatureHigh)->format('g:i');
 
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At $targetHourString $temperature" . "°C, no rain is expected. Sunrise $sunrise. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
+            $this->lineTwo = "At $targetHourString $temperature" . "°C, no rain is expected. Daylight $sunrise"."am - $sunset"."pm. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
         }
         else {
             $worstRain = Carbon::createFromTimestamp($dailyData->precipIntensityMaxTime)->format('g:i A');
