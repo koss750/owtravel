@@ -694,7 +694,7 @@ class LinkHookController extends Controller
         }
         else {
             $worstRain = Carbon::createFromTimestamp($dailyData->precipIntensityMaxTime)->format('g:i A');
-            $this->lineTwo = "At $targetHourString, $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Sunrise $sunrise. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
+            $this->lineTwo = "At $targetHourString, $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Daylight $sunrise"."am - $sunset"."pm. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
         }
 
         $logValue = [
