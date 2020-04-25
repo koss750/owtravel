@@ -24,10 +24,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('link:check:kc')
+/*        $schedule->command('link:check:kc')
             ->weekdays()
             ->everyTenMinutes()
-            ->between('7:08', '7:48');
+            ->between('7:08', '7:48');*/
 
 //        $schedule->command('link:check:lww')
 //            ->weekdays()
