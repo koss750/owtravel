@@ -46,7 +46,7 @@ class CheckEW extends Command
         $this->controller->eveningWeather();
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
-        $this->controller->action = "notification";
+        $this->controller->action = "sms";
         if (!$debug) {
             $this->controller->sendToIffft("K");
             $this->controller->sendToIffft("L");

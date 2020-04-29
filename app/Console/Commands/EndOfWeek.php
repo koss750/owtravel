@@ -44,13 +44,12 @@ class EndOfWeek extends Command
 
         $debug = $this->option('debug');
         $this->controller->endOfWeek();
-        $this->controller->action = "notification";
 
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
 
         if (!$debug) {
-            $this->controller->action = "notification";
+            $this->controller->action = "sms";
             $this->controller->sendToIffft("K");
             $this->controller->sendToIffft("L");
         }

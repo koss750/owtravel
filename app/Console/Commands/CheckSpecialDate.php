@@ -58,7 +58,25 @@ class CheckSpecialDate extends Command
             $this->controller->lineTwo = "Happy New Year!!! Let 2020 be great";
             $this->controller->action = "notification";
         }
+        if ($timeString == "200520") {
+            $specialOccasion = true;
+            $this->controller->lineOne = "A special message from your smart home";
+            $this->controller->lineTwo = "Happy 2 Months-day to little cutie Ariana! :) ";
+            $this->controller->action = "notification";
+        }
+        if ($timeString == "010620") {
+            $specialOccasion = true;
+            $this->controller->lineOne = "A special message from your smart home";
+            $this->controller->lineTwo = "Let the summer begin!";
+            $this->controller->action = "notification";
+        }
+        if ($timeString == "200620") {
+            $specialOccasion = true;
+            $this->controller->lineOne = "A special message from your smart home";
+            $this->controller->lineTwo = "Happy 3 Months-day to little cutie Ariana! :) ";
+        }
         if ($specialOccasion && !$debug) {
+            $this->controller->action = "sms";
             $this->controller->sendToIffft("K");
             $this->controller->sendToIffft("L");
         } else {

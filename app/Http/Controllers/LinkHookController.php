@@ -766,6 +766,42 @@ class LinkHookController extends Controller
 
     }
 
+    public function prepareLinesForSms() {
+
+        $combinedLines = $this->lineOne . ". " . $this->lineTwo;
+        $formattedMessage = str_replace(" ", "+", $combinedLines);
+        return str_replace("°", "'", $formattedMessage);
+
+    }
+
+    public function sendTextMessage($recipient) {
+
+        $api = "TEXT_MAGIC_"  . $recipient;
+
+        try {
+
+            $expiresAt = now()->addMinutes(4);
+            Cache::put($this->action . $api, true, $expiresAt);
+
+            $hook = $this->hookUp($api, [
+                'API_MESSAGE' => $this->prepareLinesForSms()
+            ], $this->debug
+            );
+
+            $logValue = $this->lineOne . " " . $this->lineTwo;
+
+            $this->log($api, $this->action, $logValue);
+
+        } catch (\Exception $e) {
+
+            Cache::forget($api);
+            if ($this->debug) report($e);
+            abort('500', "Error passing information to IFTTT $e");
+
+        }
+
+    }
+
     public function sendToIffft($recipient) {
 
         $api = "IFTTT_" . $recipient;
@@ -779,6 +815,9 @@ class LinkHookController extends Controller
             $response = "<br>The following was sent to IFTTT less than 5 mins ago:<br>";
             $response .= "<br> $this->lineOne <br> $this->lineTwo";
             echo $response;
+        }
+        else if ($this->action=="sms") {
+            $this->sendTextMessage($recipient);
         }
         else {
             try {
