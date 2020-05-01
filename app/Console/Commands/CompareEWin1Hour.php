@@ -82,7 +82,7 @@ class CompareEWin1Hour extends Command
         }
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
-        $this->controller->action = "sms";
+        $this->controller->action = "notification";
         if (!$debug) {
             $this->controller->sendToIffft("K");
             $this->controller->sendToIffft("L");
