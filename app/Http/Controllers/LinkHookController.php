@@ -709,6 +709,7 @@ class LinkHookController extends Controller
 
     }
 
+
     public function oneHourWeather($startingTime) {
         $date = $startingTime->addHour(1)->startOfHour()->toDateTimeString();
         $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date,'Europe/London');
