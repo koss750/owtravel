@@ -659,12 +659,12 @@ class LinkHookController extends Controller
         $dayToday = date("D");
 
         if ($dayToday == "Fri" || $dayToday == "Sat") {
-            $targetTime = "05:30";
-            $targetHourString = "5.30am";
+            $targetTime = "07:00";
+            $targetHourString = "7.00am";
         }
         else {
-            $targetTime = "05:30";
-            $targetHourString = "5.30am";
+            $targetTime = "9:30";
+            $targetHourString = "9.30am";
         }
 
         $carbon_obj = Carbon::createFromFormat('Y-m-d H:i:s' , $date . $targetTime . ':00','Europe/London');
@@ -690,11 +690,21 @@ class LinkHookController extends Controller
         $this->lineOne = "Good evening! Weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
-            $this->lineTwo = "At $targetHourString $temperature" . "°C, no rain is expected. Daylight $sunrise"."am - $sunset"."pm. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
+            $this->lineTwo = "No rain at $targetHourString, $temperature" . "°C. Daylight $sunrise"."am - $sunset"."pm. ";
         }
         else {
             $worstRain = Carbon::createFromTimestamp($dailyData->precipIntensityMaxTime)->format('g:i A');
-            $this->lineTwo = "At $targetHourString, $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Daylight $sunrise"."am - $sunset"."pm. Max temp " . $maxTemp. "°C at $maxTempTime" . "pm";
+            $this->lineTwo = "At $targetHourString, $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Daylight $sunrise"."am - $sunset"."pm. ";
+        }
+
+        if ($maxTemp > 29) {
+            $this->lineOne = "Very HOT weather warning, be careful! $maxTemp"."°C tomorrow";
+        }
+        else if ($maxTemp > 22) {
+            $this->lineOne = "Summer day coming! $maxTemp"."°C tomorrow";
+        }
+        else if ($maxTemp > 15) {
+            $this->lineOne = "Mild weather tomorrow, $maxTemp"."°C";
         }
 
         $logValue = [
