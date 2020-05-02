@@ -57,17 +57,14 @@ class CheckHW extends Command
         $rainIndex1h = $chanceLater[1] * $intLater[1];
         $rainIndexIncreasing = ($rainIndex0h<$rainIndex1h);
 
-        if ($rainIndex0h == $rainIndex1h && $rainIndex1h == 0) {
-            $this->controller->lineOne = "Clear";
-            $this->controller->lineTwo = "No Rain to develop within the hour";
-        } else if ($rainIndexIncreasing && $rainIndex1h > 100 && $rainIndex0h < 100) {
+        if ($rainIndexIncreasing && $rainIndex1h > 100 && $rainIndex0h < 100) {
             $this->controller->lineOne = "Rain Warning!";
             $this->controller->lineTwo = "Rain to start within the hour";
         }
 
         $this->info($this->controller->lineOne);
         $this->info($this->controller->lineTwo);
-        $this->controller->action = "notification";
+        $this->controller->action = "sms";
         if (!$debug) {
             $this->controller->sendToIffft("K");
             //$this->controller->sendToIffft("L");

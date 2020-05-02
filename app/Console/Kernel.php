@@ -50,6 +50,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('link:eow')
             ->fridays()
             ->at('17:30');
+
+        $schedule->command('link:check:hw')
+            ->hourly()
+            ->between('6:01', '22:59');
     }
 
     /**
