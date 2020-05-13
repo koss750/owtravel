@@ -3,13 +3,11 @@
 namespace App\Console\Commands;
 
 use App\BankCard;
-use App\Document;
-use App\DocumentTypes;
 use App\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
-class NewDocument extends Command
+class NewBankCard extends Command
 {
     /**
      * The name and signature of the console command.
