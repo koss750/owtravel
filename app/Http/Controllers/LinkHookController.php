@@ -697,8 +697,11 @@ class LinkHookController extends Controller
             $this->lineTwo = "At $targetHourString, $summary, $temperature" . "°C. $rainChance% rain. Rain intensity $rainPower. Worst rain at $worstRain. Daylight $sunrise"."am - $sunset"."pm. ";
         }
 
-        if ($maxTemp > 29) {
-            $this->lineOne = "Very HOT weather warning, be careful! $maxTemp"."°C tomorrow";
+        if ($maxTemp > 28) {
+            $this->lineOne = "CRAZY DANGEROUS HOT WEATHER COMING! $maxTemp"."°C tomorrow";
+        }
+        else if ($maxTemp > 24) {
+            $this->lineOne = "Very HOT weather warning! $maxTemp"."°C tomorrow";
         }
         else if ($maxTemp > 22) {
             $this->lineOne = "Summer day coming! $maxTemp"."°C tomorrow";
