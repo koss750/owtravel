@@ -13,7 +13,7 @@ class ShowBankCards extends Command
      *
      * @var string
      */
-    protected $signature = 'show:payment';
+    protected $signature = 'show:payment {name} {--curve} {--amex} {--debug=} ';
 
     /**
      * The console command description.
@@ -39,9 +39,8 @@ class ShowBankCards extends Command
      */
     public function handle()
     {
-        $userQuery = $this->ask('Full name of the user');
 
-
+        $userQuery = $this->argument("name");
         $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->get();
         if ($user->count()>1) {
             $user->toArray();
@@ -54,7 +53,9 @@ class ShowBankCards extends Command
         }
         else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
 
-        $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
+        if ($this->option('amex')) $specificQuery="amex";
+        else if ($this->option('curve')) $specificQuery="curve";
+        else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
 
         if ($specificQuery == "all") {
 
