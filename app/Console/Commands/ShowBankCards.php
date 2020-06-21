@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\BankCard;
 use App\User;
+use DecryptException;
 use Illuminate\Console\Command;
 
 class ShowBankCards extends Command
@@ -13,7 +14,7 @@ class ShowBankCards extends Command
      *
      * @var string
      */
-    protected $signature = 'show:payment {name} {--curve} {--amex} {--debug=} ';
+    protected $signature = 'show:payment {name} {--curve} {--amex} {--debug} {--bank=}';
 
     /**
      * The console command description.
@@ -41,8 +42,8 @@ class ShowBankCards extends Command
     {
 
         $userQuery = $this->argument("name");
-        $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->get();
-        if ($user->count()>1) {
+        $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
+        if ($user->count() > 1) {
             $user->toArray();
             $this->info("Which of these users did you mean?");
             foreach ($user as $item) {
@@ -50,20 +51,18 @@ class ShowBankCards extends Command
             }
             $userQuery = $this->ask("ID:");
             $user = User::where('id', $userQuery)->firstOrFail();
-        }
-        else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
+        } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->firstOrFail();
 
-        if ($this->option('amex')) $specificQuery="amex";
-        else if ($this->option('curve')) $specificQuery="curve";
+        if ($this->option('amex')) $specificQuery = "amex";
+        else if ($this->option('curve')) $specificQuery = "curve";
+        else if ($this->option('bank')) $specificQuery = $this->option('bank');
         else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
 
         if ($specificQuery == "all") {
 
             $items = BankCard::where('user_id', $user->id)->get();
 
-        }
-
-        else {
+        } else {
 
             $items = BankCard::where([
                 ["user_id", "=", $user->id],
@@ -75,19 +74,22 @@ class ShowBankCards extends Command
         $headers = ['Bank', 'Number', 'Expiry', 'CVC'];
 
         $data = array();
+        try {
+            foreach ($items as $item) {
 
-        foreach ($items as $item) {
+                $data[] =
+                    [
+                        'Bank' => $item->bank,
+                        'Number' => decrypt($item->ln),
+                        'Expiry' => "$item->expiry_month / $item->expiry_year",
+                        'CVC' => decrypt($item->CVC)
+                    ];
 
-            $data[] =
-                [
-                    'Bank' => $item->bank,
-                    'Number' => $item->ln,
-                    'Expiry' => "$item->expiry_month / $item->expiry_year",
-                    'CVC' => $item->CVC
-                ];
-
+            }
+            $this->table($headers, $data);
+        } catch (\Exception $e) {
+            $this->warn("One or more cards for $user->name is not encrypted. Please run 'link:encrypt:cards $userQuery' and try again");
         }
 
-        $this->table($headers, $data);
     }
 }
