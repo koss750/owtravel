@@ -42,6 +42,10 @@ class ShowBankCards extends Command
     {
 
         $userQuery = $this->argument("name");
+
+        if ($this->argument("name")=="x") $userQuery = "konstantin";
+        if ($this->argument("name")=="xx") $userQuery = "konstantin";
+
         $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
         if ($user->count() > 1) {
             $user->toArray();
@@ -56,6 +60,8 @@ class ShowBankCards extends Command
         if ($this->option('amex')) $specificQuery = "amex";
         else if ($this->option('curve')) $specificQuery = "curve";
         else if ($this->option('bank')) $specificQuery = $this->option('bank');
+        else if ($this->argument("name")=="x") $specificQuery = "curve";
+        else if ($this->argument("name")=="xx") $specificQuery = "Amex BA";
         else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
 
         if ($specificQuery == "all") {
