@@ -659,8 +659,8 @@ class LinkHookController extends Controller
         $dayToday = date("D");
 
         if ($dayToday == "Fri" || $dayToday == "Sat") {
-            $targetTime = "07:00";
-            $targetHourString = "7.00am";
+            $targetTime = "07:30";
+            $targetHourString = "7.30am";
         }
         else {
             $targetTime = "9:30";
@@ -687,7 +687,7 @@ class LinkHookController extends Controller
         $maxTemp = round(($dailyData->temperatureHigh - 32) / 1.8);
         $maxTempTime = Carbon::createFromTimestamp($dailyData->temperatureHigh)->format('g:i');
 
-        $this->lineOne = "Good evening! Weather report:";
+        $this->lineOne = "Good evening! St. Petersburg weather report:";
 
         if ($rainPower == 0 && $rainChance ==0) {
             $this->lineTwo = "No rain at $targetHourString, $temperature" . "°C. Daylight $sunrise"."am - $sunset"."pm. ";
@@ -706,8 +706,17 @@ class LinkHookController extends Controller
         else if ($maxTemp > 22) {
             $this->lineOne = "Summer day coming! $maxTemp"."°C tomorrow";
         }
-        else if ($maxTemp > 15) {
+        else if ($maxTemp > 16) {
             $this->lineOne = "Mild weather tomorrow, $maxTemp"."°C";
+        }
+        else if ($maxTemp < 7) {
+            $this->lineOne = "Cold weather tomorrow, $maxTemp"."°C";
+        }
+        else if ($maxTemp < 3) {
+            $this->lineOne = "Very cold weather tomorrow, $maxTemp"."°C";
+        }
+        else if ($maxTemp < 0) {
+            $this->lineOne = "FREEZING tomorrow, $maxTemp"."°C";
         }
 
         $logValue = [
