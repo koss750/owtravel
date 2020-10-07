@@ -64,6 +64,7 @@ class ShowDocuments extends Command
                 [
                     'Document' => $doc->description,
                     'Number' => $doc->number,
+                    'Valid to' => $doc->valid_to,
                 ];
 
         }

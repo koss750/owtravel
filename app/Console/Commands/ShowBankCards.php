@@ -60,8 +60,6 @@ class ShowBankCards extends Command
         if ($this->option('amex')) $specificQuery = "amex";
         else if ($this->option('curve')) $specificQuery = "curve";
         else if ($this->option('bank')) $specificQuery = $this->option('bank');
-        else if ($this->argument("name")=="x") $specificQuery = "curve";
-        else if ($this->argument("name")=="xx") $specificQuery = "Amex BA";
         else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
 
         if ($specificQuery == "all") {

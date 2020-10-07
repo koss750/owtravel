@@ -685,6 +685,7 @@ class LinkHookController extends Controller
         $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');    
         $sunset = Carbon::createFromTimestamp($dailyData->sunsetTime)->format('g:i');
         $maxTemp = round(($dailyData->temperatureHigh - 32) / 1.8);
+        $minTemp = round(($dailyData->temperatureLow - 32) / 1.8);
         $maxTempTime = Carbon::createFromTimestamp($dailyData->temperatureHigh)->format('g:i');
 
         $this->lineOne = "Good evening! St. Petersburg weather report:";
@@ -709,14 +710,19 @@ class LinkHookController extends Controller
         else if ($maxTemp > 16) {
             $this->lineOne = "Mild weather tomorrow, $maxTemp"."°C";
         }
-        else if ($maxTemp < 7) {
-            $this->lineOne = "Cold weather tomorrow, $maxTemp"."°C";
-        }
-        else if ($maxTemp < 3) {
-            $this->lineOne = "Very cold weather tomorrow, $maxTemp"."°C";
-        }
-        else if ($maxTemp < 0) {
-            $this->lineOne = "FREEZING tomorrow, $maxTemp"."°C";
+        else {
+            if ($minTemp < 7) {
+                $this->lineOne = "Cold weather tomorrow, down to $minTemp"."°C";
+            }
+            else if ($minTemp < 3) {
+                $this->lineOne = "Very cold weather tomorrow, down to $minTemp"."°C";
+            }
+            else if ($minTemp < 0) {
+                $this->lineOne = "FREEZING tomorrow, down to $minTemp"."°C";
+            }
+            else if ($minTemp < -9) {
+                $this->lineOne = "CRAZY SUPER FREEZING tomorrow, down to $minTemp"."°C";
+            }
         }
 
         $logValue = [
