@@ -56,15 +56,16 @@ class ShowDocuments extends Command
 
         $docs = Document::where('user_id', $user->id)->get();
         $data = array();
-        $headers = ['Document', 'Number'];
+        $headers = ['Country', 'Description', 'Number', 'Expires'];
 
         foreach ($docs as $doc) {
 
             $data[] =
                 [
-                    'Document' => $doc->description,
+                    'Country' => $doc->issue_country,
+                    'Description' => $doc->description,
                     'Number' => $doc->number,
-                    'Valid to' => $doc->valid_to,
+                    'Expiry' => $doc->valid_to,
                 ];
 
         }
