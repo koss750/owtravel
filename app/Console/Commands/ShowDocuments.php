@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Document;
+use App\DocumentTypes;
 use App\User;
 use Illuminate\Console\Command;
 
@@ -56,14 +57,16 @@ class ShowDocuments extends Command
 
         $docs = Document::where('user_id', $user->id)->get();
         $data = array();
-        $headers = ['Country', 'Description', 'Number', 'Expires'];
-
+        $headers = ['Description', 'Notes', 'Number', 'Expires'];
+        
         foreach ($docs as $doc) {
 
+            $documentType = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
+            $documentTableDescription = $doc->issue_country . " " . $documentType->description;
             $data[] =
                 [
-                    'Country' => $doc->issue_country,
-                    'Description' => $doc->description,
+                    'Description' => $documentTableDescription,
+                    'Notes' => $doc->description,
                     'Number' => $doc->number,
                     'Expiry' => $doc->valid_to,
                 ];
