@@ -75,7 +75,7 @@ class ShowBankCards extends Command
 
         }
 
-        $headers = ['Bank', 'Number', 'Expiry', 'CVC'];
+        $headers = ['Bank', 'Account', 'Number', 'Expiry', 'CVC'];
 
         $data = array();
         try {
@@ -84,6 +84,7 @@ class ShowBankCards extends Command
                 $data[] =
                     [
                         'Bank' => $item->bank,
+                        'Account' => $item->account,
                         'Number' => decrypt($item->ln),
                         'Expiry' => "$item->expiry_month / $item->expiry_year",
                         'CVC' => decrypt($item->CVC)
