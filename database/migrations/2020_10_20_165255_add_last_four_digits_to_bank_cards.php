@@ -15,20 +15,7 @@ class AddLastFourDigitsToBankCards extends Migration
     public function up()
     {
         Schema::table('bank_cards', function (Blueprint $table) {
-            $table->string('last_four')->after('bank');
-            $items = BankCard::all();
-            foreach ($items as $item) {
-                $long = $item->ln;
-
-                try {
-                    $short = substr(decrypt($long), -4);
-                } catch (\Exception $e) {
-                    $short = substr($long, -4);
-                }
-
-                $item->last_four = $short;
-                $item->save();
-            }
+            $table->string('last_four')->after('ln');
         });
     }
 
