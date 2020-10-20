@@ -60,7 +60,10 @@ class ShowBankCards extends Command
             } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->firstOrFail();
         }
 
-        if ($this->option('e')) $likeQuery = $this->option('e');
+        if ($this->option('e')) {
+            $likeQuery = $this->option('e');
+            $globalSearch = true;
+        }
 
         if ($globalSearch) {
             $items = BankCard::all();
