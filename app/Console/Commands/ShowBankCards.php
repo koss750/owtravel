@@ -14,7 +14,7 @@ class ShowBankCards extends Command
      *
      * @var string
      */
-    protected $signature = 'show:payment {name} {--curve} {--amex} {--debug} {--bank=}';
+    protected $signature = 'show:payment {name} {--curve} {--amex} {--debug} {--bank=} {--e=}';
 
     /**
      * The console command description.
@@ -80,7 +80,7 @@ class ShowBankCards extends Command
         $headers = ['Bank', 'Account', 'Number', 'Expiry', 'CVC'];
 
         $data = array();
-        
+
         try {
             foreach ($items as $item) {
 
