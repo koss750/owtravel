@@ -45,18 +45,20 @@ class ShowBankCards extends Command
         $globalSearch = false;
 
         if ($this->argument("name")=="xx") $userQuery = "konstantin";
-        if ($this->argument("name")=="x") $globalSearch = true;
 
-        $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
-        if ($user->count() > 1) {
-            $user->toArray();
-            $this->info("Which of these users did you mean?");
-            foreach ($user as $item) {
-                $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
-            }
-            $userQuery = $this->ask("ID:");
-            $user = User::where('id', $userQuery)->firstOrFail();
-        } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->firstOrFail();
+        if ($this->argument("name")=="x") $globalSearch = true;
+        else {
+            $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
+            if ($user->count() > 1) {
+                $user->toArray();
+                $this->info("Which of these users did you mean?");
+                foreach ($user as $item) {
+                    $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
+                }
+                $userQuery = $this->ask("ID:");
+                $user = User::where('id', $userQuery)->firstOrFail();
+            } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->firstOrFail();
+        }
 
         if ($this->option('e')) $likeQuery = $this->option('e');
 
@@ -97,12 +99,19 @@ class ShowBankCards extends Command
                         $addRow = true;
                     }
                 }
-
                 else $addRow = true;
+
+                if ($globalSearch) {
+                    $cardholder = User::where('id', $item->user_id)->firstOrFail();
+                    $cardholderName = $cardholder->name;
+                }
+                else if (isset($user)) $cardholderName = $user->name;
+                else $cardholderName = "error getting name";
 
                 if ($addRow) {
                     $data[] =
                         [
+                            'Holder' => $cardholderName,
                             'Bank' => $item->bank,
                             'Account' => $item->account,
                             'Number' => decrypt($item->ln),
