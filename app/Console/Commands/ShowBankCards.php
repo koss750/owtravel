@@ -62,6 +62,8 @@ class ShowBankCards extends Command
         else if ($this->option('bank')) $specificQuery = $this->option('bank');
         else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
 
+        if ($this->option('e')) $likeQuery = $this->ask("Please enter the last 4 digits");
+
         if ($specificQuery == "all") {
 
             $items = BankCard::where('user_id', $user->id)->get();
@@ -78,17 +80,30 @@ class ShowBankCards extends Command
         $headers = ['Bank', 'Account', 'Number', 'Expiry', 'CVC'];
 
         $data = array();
+        
         try {
             foreach ($items as $item) {
 
-                $data[] =
-                    [
-                        'Bank' => $item->bank,
-                        'Account' => $item->account,
-                        'Number' => decrypt($item->ln),
-                        'Expiry' => "$item->expiry_month / $item->expiry_year",
-                        'CVC' => decrypt($item->CVC)
-                    ];
+                $addRow = false;
+
+                if (isset($likeQuery)) {
+                    if ($item->last_four == $likeQuery) {
+                        $addRow = true;
+                    }
+                }
+
+                else $addRow = true;
+
+                if ($addRow) {
+                    $data[] =
+                        [
+                            'Bank' => $item->bank,
+                            'Account' => $item->account,
+                            'Number' => decrypt($item->ln),
+                            'Expiry' => "$item->expiry_month / $item->expiry_year",
+                            'CVC' => decrypt($item->CVC)
+                        ];
+                }
 
             }
             $this->table($headers, $data);
