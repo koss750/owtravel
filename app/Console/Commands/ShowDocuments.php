@@ -61,7 +61,7 @@ class ShowDocuments extends Command
         
         foreach ($docs as $doc) {
 
-            $documentType = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
+            $documentType = DocumentTypes::where('id', $doc->document_type_id)->orderBy('description', 'DESC')->firstOrFail();
             $documentTableDescription = $doc->issue_country . " " . $documentType->description;
             $data[] =
                 [
