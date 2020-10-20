@@ -42,9 +42,10 @@ class ShowBankCards extends Command
     {
 
         $userQuery = $this->argument("name");
+        $globalSearch = false;
 
-        if ($this->argument("name")=="x") $userQuery = "konstantin";
         if ($this->argument("name")=="xx") $userQuery = "konstantin";
+        if ($this->argument("name")=="x") $globalSearch = true;
 
         $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
         if ($user->count() > 1) {
@@ -57,24 +58,29 @@ class ShowBankCards extends Command
             $user = User::where('id', $userQuery)->firstOrFail();
         } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->firstOrFail();
 
-        if ($this->option('amex')) $specificQuery = "amex";
-        else if ($this->option('curve')) $specificQuery = "curve";
-        else if ($this->option('bank')) $specificQuery = $this->option('bank');
-        else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
+        if ($this->option('e')) $likeQuery = $this->option('e');
 
-        if ($this->option('e')) $likeQuery = $this->ask("Please enter the last 4 digits");
+        if ($globalSearch) {
+            $items = BankCard::all();
+        }
+        else {
 
-        if ($specificQuery == "all") {
+            if ($this->option('amex')) $specificQuery = "amex";
+            else if ($this->option('curve')) $specificQuery = "curve";
+            else if ($this->option('bank')) $specificQuery = $this->option('bank');
+            else $specificQuery = $this->ask("Which bank? Type 'all' for all cards");
+
+            if ($specificQuery == "all") {
 
             $items = BankCard::where('user_id', $user->id)->get();
 
         } else {
 
-            $items = BankCard::where([
-                ["user_id", "=", $user->id],
-                ['bank', 'LIKE', "%$specificQuery%"]
-            ])->get();
-
+                $items = BankCard::where([
+                    ["user_id", "=", $user->id],
+                    ['bank', 'LIKE', "%$specificQuery%"]
+                ])->get();
+            }
         }
 
         $headers = ['Bank', 'Account', 'Number', 'Expiry', 'CVC'];
