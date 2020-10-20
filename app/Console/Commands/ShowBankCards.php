@@ -85,7 +85,7 @@ class ShowBankCards extends Command
             }
         }
 
-        $headers = ['Bank', 'Account', 'Number', 'Expiry', 'CVC'];
+        $headers = ['Holder', 'Bank', 'Account', 'Number', 'Expiry', 'CVC'];
 
         $data = array();
 
