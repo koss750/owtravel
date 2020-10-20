@@ -55,13 +55,13 @@ class ShowDocuments extends Command
         }
         else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
 
-        $docs = Document::where('user_id', $user->id)->get();
+        $docs = Document::where('user_id', $user->id)->orderBy('description', 'DESC')->get();
         $data = array();
         $headers = ['Description', 'Notes', 'Number', 'Expires'];
         
         foreach ($docs as $doc) {
 
-            $documentType = DocumentTypes::where('id', $doc->document_type_id)->orderBy('description', 'DESC')->firstOrFail();
+            $documentType = DocumentTypes::where('id', $doc->document_type_id)->firstOrFail();
             $documentTableDescription = $doc->issue_country . " " . $documentType->description;
             $data[] =
                 [
