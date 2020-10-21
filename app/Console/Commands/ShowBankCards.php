@@ -136,7 +136,7 @@ class ShowBankCards extends Command
             if (!isset($user)) {
                 $user = User::where('id', $lastProcessedUser)->first();
             }
-            $this->warn("One or more cards for $user->name is not encrypted. Please run 'link:encrypt:cards $userQuery' and try again");
+            $this->warn("One or more cards for $user->name is not encrypted. Please run 'link:encrypt:cards $user->id' and try again");
         }
 
     }
