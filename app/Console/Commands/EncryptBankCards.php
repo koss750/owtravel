@@ -51,7 +51,7 @@ class EncryptBankCards extends Command
             $userQuery = $this->ask("ID:");
             $user = User::where('id', $userQuery)->firstOrFail();
         }
-        else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
+        else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->orWhere('id', $userQuery)->firstOrFail();
 
         $headers = ['Bank', 'Status'];
         $data = array();
