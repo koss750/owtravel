@@ -89,6 +89,7 @@ class ShowBankCards extends Command
         }
 
         $headers = ['Holder', 'Bank', 'Account', 'Number', 'Expiry', 'CVC'];
+        if (!$globalSearch) unset($headers["Holder"]);
 
         $data = array();
 
@@ -112,15 +113,18 @@ class ShowBankCards extends Command
                 else $cardholderName = "error getting name";
 
                 if ($addRow) {
-                    $data[] =
-                        [
-                            'Holder' => $cardholderName,
-                            'Bank' => $item->bank,
-                            'Account' => $item->account,
-                            'Number' => decrypt($item->ln),
-                            'Expiry' => "$item->expiry_month / $item->expiry_year",
-                            'CVC' => decrypt($item->CVC)
-                        ];
+                    $newRow = [
+                        'Holder' => $cardholderName,
+                        'Bank' => $item->bank,
+                        'Account' => $item->account,
+                        'Number' => decrypt($item->ln),
+                        'Expiry' => "$item->expiry_month / $item->expiry_year",
+                        'CVC' => decrypt($item->CVC)
+                    ];
+                    
+                    if (!$globalSearch) unset($newRow["Holder"]);
+                    $data[] = $newRow;
+
                 }
 
             }
