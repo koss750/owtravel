@@ -41,8 +41,10 @@ class EncryptBankCards extends Command
     {
 
         $userQuery = $this->argument("name");
+        $headers = ['Bank', 'Status'];
+        $data = array();
 
-        if ($userQuery = "all") {
+        if ($userQuery == "all") {
             $items = BankCard::all();
         }
         else {
@@ -56,9 +58,6 @@ class EncryptBankCards extends Command
                 $userQuery = $this->ask("ID:");
                 $user = User::where('id', $userQuery)->firstOrFail();
             } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->orWhere('id', $userQuery)->firstOrFail();
-
-            $headers = ['Bank', 'Status'];
-            $data = array();
 
             $items = BankCard::where('user_id', $user->id)->get();
         }
