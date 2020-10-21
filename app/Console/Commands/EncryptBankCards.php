@@ -41,22 +41,27 @@ class EncryptBankCards extends Command
     {
 
         $userQuery = $this->argument("name");
-        $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->get();
-        if ($user->count()>1) {
-            $user->toArray();
-            $this->info("Which of these users did you mean?");
-            foreach ($user as $item) {
-                $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
-            }
-            $userQuery = $this->ask("ID:");
-            $user = User::where('id', $userQuery)->firstOrFail();
+
+        if ($userQuery = "all") {
+            $items = BankCard::all();
         }
-        else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->orWhere('id', $userQuery)->firstOrFail();
+        else {
+            $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->get();
+            if ($user->count() > 1) {
+                $user->toArray();
+                $this->info("Which of these users did you mean?");
+                foreach ($user as $item) {
+                    $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
+                }
+                $userQuery = $this->ask("ID:");
+                $user = User::where('id', $userQuery)->firstOrFail();
+            } else $user = User::where('name', 'LIKE', '%' . $userQuery . '%')->orWhere('id', $userQuery)->firstOrFail();
 
-        $headers = ['Bank', 'Status'];
-        $data = array();
+            $headers = ['Bank', 'Status'];
+            $data = array();
 
-        $items = BankCard::where('user_id', $user->id)->get();
+            $items = BankCard::where('user_id', $user->id)->get();
+        }
 
         foreach ($items as $card) {
             try {
