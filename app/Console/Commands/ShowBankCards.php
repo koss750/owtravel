@@ -89,7 +89,9 @@ class ShowBankCards extends Command
         }
 
         $headers = ['Holder', 'Bank', 'Account', 'Number', 'Expiry', 'CVC'];
-        if (!$globalSearch) unset($headers["Holder"]);
+        if (!$globalSearch) unset($headers[0]);
+
+        $lastProcessedUser = null;
 
         $data = array();
 
@@ -97,6 +99,7 @@ class ShowBankCards extends Command
             foreach ($items as $item) {
 
                 $addRow = false;
+                $lastProcessedUser = $item->user_id;
 
                 if (isset($likeQuery)) {
                     if ($item->last_four == $likeQuery) {
@@ -121,7 +124,7 @@ class ShowBankCards extends Command
                         'Expiry' => "$item->expiry_month / $item->expiry_year",
                         'CVC' => decrypt($item->CVC)
                     ];
-                    
+
                     if (!$globalSearch) unset($newRow["Holder"]);
                     $data[] = $newRow;
 
@@ -130,6 +133,9 @@ class ShowBankCards extends Command
             }
             $this->table($headers, $data);
         } catch (\Exception $e) {
+            if (!isset($user)) {
+                $user = User::where('id', $lastProcessedUser)->first();
+            }
             $this->warn("One or more cards for $user->name is not encrypted. Please run 'link:encrypt:cards $userQuery' and try again");
         }
 
