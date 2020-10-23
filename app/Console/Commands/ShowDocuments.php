@@ -57,7 +57,7 @@ class ShowDocuments extends Command
 
         $docs = Document::where('user_id', $user->id)->orderBy('description', 'DESC')->get();
         $data = array();
-        $headers = ['Description', 'Notes', 'Number', 'Authority', 'Expires'];
+        $headers = ['Description', 'Notes', 'Number', 'Expires', 'Authority'];
         
         foreach ($docs as $doc) {
 
@@ -68,8 +68,8 @@ class ShowDocuments extends Command
                     'Description' => $documentTableDescription,
                     'Notes' => $doc->description,
                     'Number' => $doc->number,
-                    'Authority' => $doc->issued_by,
                     'Expiry' => $doc->valid_to,
+                    'Authority' => $doc->issued_by
                 ];
 
         }
