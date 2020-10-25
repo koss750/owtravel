@@ -42,18 +42,22 @@ class ShowDocuments extends Command
     {
         $userQuery = $this->ask('Full name of the user');
 
-
-        $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->get();
-        if ($user->count()>1) {
-            $user->toArray();
-            $this->info("Which of these users did you mean?");
-            foreach ($user as $item) {
-                $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
+        try {
+            $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->get();
+            if ($user->count()>1) {
+                $user->toArray();
+                $this->info("Which of these users did you mean?");
+                foreach ($user as $item) {
+                    $this->info("<fg=cyan> $item->id    <fg=default;bg=black>$item->name</>");
+                }
+                $userQuery = $this->ask("ID:");
+                $user = User::where('id', $userQuery)->firstOrFail();
             }
-            $userQuery = $this->ask("ID:");
-            $user = User::where('id', $userQuery)->firstOrFail();
+            else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
+        } catch (\Exception $e) {
+            $this->warn('Searching the user was unsuccessful. Please try again and check the spelling this time. Do not be like Fom');
         }
-        else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
+
 
         $docs = Document::where('user_id', $user->id)->orderBy('description', 'DESC')->get();
         $data = array();
