@@ -56,6 +56,7 @@ class ShowDocuments extends Command
             else $user = User::where('name', 'LIKE', '%' .$userQuery.'%')->firstOrFail();
         } catch (\Exception $e) {
             $this->warn('Searching the user was unsuccessful. Please try again and check the spelling this time. Do not be like Fom');
+            return false;
         }
 
 
