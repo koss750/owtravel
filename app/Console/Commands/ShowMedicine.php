@@ -50,7 +50,7 @@ class ShowMedicine extends Command
         
         foreach ($items as $item) {
 
-            $dose = $item->default_dose . $item->dd_unit;
+            $dose = $item->default_doze . $item->dd_units;
             $newLine =
                 [
                     'Code' => $item->code,
