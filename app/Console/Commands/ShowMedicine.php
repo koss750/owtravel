@@ -44,7 +44,9 @@ class ShowMedicine extends Command
     {
         $query = $this->ask('Enter the code or name of medication. For a full list type all');
 
-        $items = Kospital::where('code', $query)->orWhere("name", "LIKE", "%$query%")->orderBy('code', 'DESC')->get();
+        if ($query == "all") {
+            $items = Kospital::all();
+        } else $items = Kospital::where('code', $query)->orWhere("name", "LIKE", "%$query%")->orderBy('code', 'DESC')->get();
         $data = array();
         $headers = ['Code', 'Name', 'Dose', 'Notes'];
         
