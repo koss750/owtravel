@@ -70,7 +70,7 @@ class ShowMedicine extends Command
                 if ($item->supplement) {
                     $newLine['Notes'] = "Food supplement, not a medicine";
                 }
-                
+
             }
             $data[] = $newLine;
 

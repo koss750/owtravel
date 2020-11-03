@@ -20,7 +20,7 @@ class CreateKospitalTable extends Migration
             $table->string('name');
             $table->integer('default_doze');
             $table->string('dd_units');
-            $table->integer('default_origin');
+            $table->string('default_origin');
             $table->boolean('otc');
             $table->boolean('cd');
             $table->boolean('supplement');
