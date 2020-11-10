@@ -72,6 +72,9 @@ class ShowMedicine extends Command
                 if ($item->supplement) {
                     $newLine['Notes'] = "Food supplement, not a medicine";
                 }
+                if ($item->pom) {
+                    $newLine['Notes'] = "Prescription-only medication in origin ($country)";
+                }
 
             }
             $data[] = $newLine;

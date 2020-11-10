@@ -24,6 +24,7 @@ class CreateKospitalTable extends Migration
             $table->boolean('otc');
             $table->boolean('cd');
             $table->boolean('supplement');
+            $table->boolean('pom');
             $table->timestamps();
             $table->softDeletes();
         });

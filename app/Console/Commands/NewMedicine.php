@@ -54,6 +54,7 @@ class NewMedicine extends Command
         $country = $country->title;
         $item->otc = $this->ask("Is this over-the-counter in $country?");
         $item->cd = $this->ask("Is this a controlled drug in $country?");
+        $item->pom = $this->ask("Is this prescription-only in $country?");
         $item->supplement = $this->ask("Is this a food supplement?");
         $item->reference = Str::uuid();
         $item->save();
