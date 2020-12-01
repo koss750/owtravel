@@ -60,7 +60,7 @@ class ShowMedicine extends Command
 
             $newLine =
                 [
-                    'List' => $item->code
+                    'List' => $item
                 ];
             $data[] = $newLine;
 
@@ -76,7 +76,7 @@ class ShowMedicine extends Command
 
             $newLine =
                 [
-                    'List' => $item->code
+                    'List' => $item
                 ];
             $data[] = $newLine;
 
