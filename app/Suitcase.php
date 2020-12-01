@@ -29,7 +29,7 @@ class Suitcase extends Model
     }
 
     private function minimalClothing() {
-        $calc = 1+round(.75*$this->duration);
+        $calc = round(.75*$this->duration);
         $this->add("Spare underwear x$calc");
         $this->add("Spare socks x$calc pairs");
     }
@@ -49,7 +49,7 @@ class Suitcase extends Model
         }
         if ($this->involvesCountry("RUS")){
             $this->add("Passport N RUS");
-            $this->add("RUS/GBR simcard");
+            if ($this->tripAbroad()) $this->add("RUS/GBR simcard");
         }
         if ($this->involvesCountry("ITA")){
             $this->add("Residence Permit ITA");
@@ -103,6 +103,7 @@ class Suitcase extends Model
     }
 
     private function generateKospital () {
+        $this->empty();
         $a1Calculation = 12*$this->duration;
         $b2Calculation = 3*$this->duration;
         $spmCalculation = 3*$this->duration;
@@ -122,6 +123,11 @@ class Suitcase extends Model
         $this->add("Small selection of plasters");
 
         $this->addOptional("Please check Kospital for additional items");
+    }
+
+    private function empty() {
+        $this->contents = [];
+        $this->optContents = [];
     }
 
     private function add($item) {
