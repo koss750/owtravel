@@ -12,6 +12,7 @@ class Suitcase extends Model
     public $methodOfTransport;
     public $contents;
     public $optContents;
+    public $kospitalContents;
     public $origin;
     public $swimming;
     public $climate;
@@ -110,17 +111,17 @@ class Suitcase extends Model
         $t1Calculation = 1+round(.33*$this->duration);
         $y10Calculation = 17*$this->duration;
 
-        $this->add("Kospital A1 x$a1Calculation");
-        $this->add("Kospital SPM x$spmCalculation");
-        $this->add("Kospital T1 x$t1Calculation");
-        $this->add("Kospital B2 x$b2Calculation");
-        $this->add("Kospital S1 x$this->duration");
-        $this->add("Kospital Y10 x$y10Calculation");
-        $this->add("Shampoo anti dd");
-        $this->add("Nasal Spray steroid");
-        $this->add("Nasal Spray like Otrivine");
-        $this->add("Bandage");
-        $this->add("Small selection of plasters");
+        $this->addKospital("Kospital A1 x$a1Calculation");
+        $this->addKospital("Kospital SPM x$spmCalculation");
+        $this->addKospital("Kospital T1 x$t1Calculation");
+        $this->addKospital("Kospital B2 x$b2Calculation");
+        $this->addKospital("Kospital S1 x$this->duration");
+        $this->addKospital("Kospital Y10 x$y10Calculation");
+        $this->addKospital("Shampoo anti dd");
+        $this->addKospital("Nasal Spray steroid");
+        $this->addKospital("Nasal Spray like Otrivine");
+        $this->addKospital("Bandage");
+        $this->addKospital("Small selection of plasters");
 
         $this->addOptional("Back scratcher");
         $this->addOptional("Please check Kospital for additional items");
@@ -137,6 +138,10 @@ class Suitcase extends Model
 
     private function addOptional($item) {
         $this->optContents[] = $item;
+    }
+
+    private function addKospital($item) {
+        $this->kospitalContents[] = $item;
     }
 
     public function departingCountry($country){

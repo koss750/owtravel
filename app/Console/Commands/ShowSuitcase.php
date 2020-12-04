@@ -68,6 +68,22 @@ class ShowMedicine extends Command
 
         $newLine =
             [
+                'List' => "KOSPITAL"
+            ];
+        $data[] = $newLine;
+
+        foreach ($suitcase->kospitalContents as $item) {
+
+            $newLine =
+                [
+                    'List' => $item
+                ];
+            $data[] = $newLine;
+
+        }
+
+        $newLine =
+            [
                 'List' => "OPTIONAL ITEMS"
             ];
         $data[] = $newLine;
