@@ -18,6 +18,7 @@ class Suitcase extends Model
 
     public function generateList() {
 
+        $this->empty();
         $this->generateDocuments();
         $this->generateKospital();
         $this->minimalClothing();
@@ -122,6 +123,7 @@ class Suitcase extends Model
         $this->add("Bandage");
         $this->add("Small selection of plasters");
 
+        $this->addOptional("Back scratcher");
         $this->addOptional("Please check Kospital for additional items");
     }
 

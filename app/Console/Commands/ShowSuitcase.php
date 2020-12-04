@@ -45,12 +45,12 @@ class ShowMedicine extends Command
     {
         $suitcase = new Suitcase();
 
-        $suitcase->destination = $this->ask('Enter the code of the destination country');
-        $suitcase->origin = $this->ask('Enter the code of the origin country');
+        $suitcase->destination = strtoupper($this->ask('Enter the code of the destination country'));
+        $suitcase->origin = strtoupper($this->ask('Enter the code of the origin country'));
         $suitcase->duration = $this->ask('How many days are you going fow');
         //$suitcase->methodOfTransport = $this->ask('');
         $suitcase->swimming = $this->ask('Are you planning to swim? 0 or 1');
-        $suitcase->climate = $this->ask('What climate is there like');
+        $suitcase->climate = $this->ask('What climate is there like, approx temp');
         $suitcase->generateList();
 
         $data = array();
