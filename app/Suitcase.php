@@ -111,12 +111,12 @@ class Suitcase extends Model
         $t1Calculation = 1+round(.33*$this->duration);
         $y10Calculation = 17*$this->duration;
 
-        $this->addKospital("Kospital A1 x$a1Calculation");
-        $this->addKospital("Kospital SPM x$spmCalculation");
-        $this->addKospital("Kospital T1 x$t1Calculation");
-        $this->addKospital("Kospital B2 x$b2Calculation");
-        $this->addKospital("Kospital S1 x$this->duration");
-        $this->addKospital("Kospital Y10 x$y10Calculation");
+        $this->addKospital("A1 x$a1Calculation");
+        $this->addKospital("SPM x$spmCalculation");
+        $this->addKospital("T1 x$t1Calculation");
+        $this->addKospital("B2 x$b2Calculation");
+        $this->addKospital("S1 x$this->duration");
+        $this->addKospital("Y10 x$y10Calculation");
         $this->addKospital("Shampoo anti dd");
         $this->addKospital("Nasal Spray steroid");
         $this->addKospital("Nasal Spray like Otrivine");
