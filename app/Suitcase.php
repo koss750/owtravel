@@ -44,11 +44,11 @@ class Suitcase extends Model
 
     private function generateDocuments() {
         if ($this->tripAbroad()) {
-            $this->add("Passport RUS");
             $this->add("Passport GBR");
             $this->addOptional("International Driving License");
         }
         if ($this->involvesCountry("RUS")){
+            $this->add("Passport RUS");
             $this->add("Passport N RUS");
             if ($this->tripAbroad()) $this->add("RUS/GBR simcard");
         }
@@ -104,7 +104,6 @@ class Suitcase extends Model
     }
 
     private function generateKospital () {
-        $this->empty();
         $a1Calculation = 12*$this->duration;
         $b2Calculation = 3*$this->duration;
         $spmCalculation = 3*$this->duration;
