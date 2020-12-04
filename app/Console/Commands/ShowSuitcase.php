@@ -54,45 +54,42 @@ class ShowMedicine extends Command
         $suitcase->generateList();
 
         $data = array();
-        $headers = ['List'];
+        $headers = ['Main Items'];
         
         foreach ($suitcase->contents as $item) {
 
             $newLine =
                 [
-                    'List' => $item
+                    'Main Items' => $item
                 ];
             $data[] = $newLine;
 
         }
+        $this->table($headers, $data);
 
-        $newLine =
-            [
-                'List' => "KOSPITAL"
-            ];
-        $data[] = $newLine;
+        $data = array();
+        $headers = ['Kospital'];
+
 
         foreach ($suitcase->kospitalContents as $item) {
 
             $newLine =
                 [
-                    'List' => $item
+                    'Kospital' => $item
                 ];
             $data[] = $newLine;
 
         }
+        $this->table($headers, $data);
 
-        $newLine =
-            [
-                'List' => "OPTIONAL ITEMS"
-            ];
-        $data[] = $newLine;
+        $data = array();
+        $headers = ['Optional'];
 
         foreach ($suitcase->optContents as $item) {
 
             $newLine =
                 [
-                    'List' => $item
+                    'Optional' => $item
                 ];
             $data[] = $newLine;
 
