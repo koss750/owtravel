@@ -135,11 +135,11 @@ class ShowBankCards extends Command
                 $textArt = "
                 ___________________________________
 |#######====================#######|
-|#*  $data[0]['Bank']                 *#|
+|#*  $data[0][\"Bank\"]                 *#|
 |#**          /===\             **#|
-|#  $data[0]['Number']           #|
+|#  $data[0][\"Number\"]           #|
 |#*          | /v\ |             *#|
-|#exp $data[0]['Expiry']   cvv $data[0]['CVC']          (1)#|
+|#exp $data[0][\"Expiry\"]   cvv $data[0][\"CVC\"]          (1)#|
 |#$holder===========*VISA*#|
 ------------------------------------
                 ";
