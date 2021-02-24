@@ -131,7 +131,21 @@ class ShowBankCards extends Command
                 }
 
             }
-            $this->table($headers, $data);
+            if ($data[0]) {
+                $textArt = "
+                ___________________________________
+|#######====================#######|
+|#*  bankName                    *#|
+|#**          /===\             **#|
+|#  1234   5678   9012   3456     #|
+|#*          | /v\ |             *#|
+|#exp mm/yy   cvv 000          (1)#|
+|#A CARDHOLDER==============*VISA*#|
+------------------------------------
+                ";
+                $this->info($textArt);
+            }
+            else $this->table($headers, $data);
         } catch (\Exception $e) {
             if (!isset($user)) {
                 $user = User::where('id', $lastProcessedUser)->first();
