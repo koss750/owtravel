@@ -135,17 +135,17 @@ class ShowBankCards extends Command
                 $textArt = "
                 ___________________________________
 |#######====================#######|
-|#*  bankName                    *#|
+|#*  $data[0]['Bank']                 *#|
 |#**          /===\             **#|
-|#  1234   5678   9012   3456     #|
+|#  $data[0]['Number']           #|
 |#*          | /v\ |             *#|
-|#exp mm/yy   cvv 000          (1)#|
-|#A CARDHOLDER==============*VISA*#|
+|#exp $data[0]['Expiry']   cvv $data[0]['CVC']          (1)#|
+|#$data[0]['Holder']===========*VISA*#|
 ------------------------------------
                 ";
                 $this->info($textArt);
             }
-            else $this->table($headers, $data);
+            $this->table($headers, $data);
         } catch (\Exception $e) {
             if (!isset($user)) {
                 $user = User::where('id', $lastProcessedUser)->first();
