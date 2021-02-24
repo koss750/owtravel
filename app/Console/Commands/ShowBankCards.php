@@ -152,7 +152,7 @@ class ShowBankCards extends Command
             }
             $this->warn("One or more cards for $user->name is not encrypted. Please run 'link:encrypt:cards $user->id' and try again");
             $this->warn("If that is not the case and all cards are safe, please refer to the following error:");
-            var_dump($e->getMessage());
+            $this->warn($e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
         }
 
     }
