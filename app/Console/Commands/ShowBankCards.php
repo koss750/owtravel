@@ -92,7 +92,7 @@ class ShowBankCards extends Command
         if (!$globalSearch) unset($headers[0]);
 
         $lastProcessedUser = null;
-
+        $cardholderName = "A CARDHOLDER";
         $data = array();
 
         try {
@@ -136,7 +136,7 @@ class ShowBankCards extends Command
                 $firstCardNumber = $data[0]['Number'];
                 $firstCardExpiry = $data[0]['Expiry'];
                 $firstCardCVC = $data[0]['CVC'];
-                $firstCardHolder = $data[0]['Holder'];
+                $firstCardHolder = $cardholderName;
                 $textArt = "
                 ___________________________________
 |#######====================#######|
