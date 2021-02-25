@@ -94,9 +94,12 @@ class ShowBankCards extends Command
         $lastProcessedUser = null;
         $cardholderName = "A CARDHOLDER";
         $data = array();
+        $counter = 0;
 
         try {
             foreach ($items as $item) {
+
+                $counter++;
 
                 $addRow = false;
                 $lastProcessedUser = $item->user_id;
@@ -115,6 +118,11 @@ class ShowBankCards extends Command
                 else if (isset($user)) $cardholderName = $user->name;
                 else $cardholderName = "error getting name";
 
+                if ($counter==1) {
+                    $cardForTextArt = $item;
+                    $cardholderNameForTextArt = $user->name;
+                }
+
                 if ($addRow) {
                     $newRow = [
                         'Holder' => $cardholderName,
@@ -131,22 +139,23 @@ class ShowBankCards extends Command
                 }
 
             }
-            if ($data[0]) {
-                $firstCardBank = $data[0]['Bank'];
-                $firstCardNumber = $data[0]['Number'];
-                $firstCardExpiry = $data[0]['Expiry'];
-                $firstCardCVC = $data[0]['CVC'];
-                $firstCardHolder = $cardholderName;
-                $textArt = "
-                ___________________________________
-|#######====================#######|
-|#*  $firstCardBank                 *#|
-|#**          /===\             **#|
-|#  $firstCardNumber           #|
-|#*          | /v\ |             *#|
-|#exp $firstCardExpiry   cvv $firstCardCVC          (1)#|
-|#$firstCardHolder===========*VISA*#|
-------------------------------------
+            if (isset($cardForTextArt)) {
+                $firstCardBank = $cardForTextArt->bank;
+                $firstCardAccount = $cardForTextArt->account;
+                $firstCardNumber = $cardForTextArt->ln;
+                $firstCardNumber = $cardForTextArt->formatLongNumber($firstCardNumber);
+                $firstCardExpiry = "$cardForTextArt->expiry_month / $cardForTextArt->expiry_year";
+                $firstCardCVC = $cardForTextArt->CVC;
+                $firstCardHolder = $cardholderNameForTextArt ?? $cardholderName;
+                $textArt = "___________________________________
+                |#######====================#######|
+                |#*$firstCardBank                   *#|
+                |#**$firstCardAccount /===\             **#|
+                |#  $firstCardNumber           #|
+                |#*          | /v\ |             *#|
+                |#exp $firstCardExpiry   cvv $firstCardCVC          (1)#|
+                |#$firstCardHolder===========*VISA*#|
+                ------------------------------------
                 ";
                 $this->info($textArt);
             }
