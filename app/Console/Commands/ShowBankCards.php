@@ -124,7 +124,7 @@ class ShowBankCards extends Command
                         'Expiry' => "$item->expiry_month / $item->expiry_year",
                         'CVC' => decrypt($item->CVC)
                     ];
-                    $holder = $newRow["Holder"];
+
                     if (!$globalSearch) unset($newRow["Holder"]);
                     $data[] = $newRow;
 
@@ -132,15 +132,20 @@ class ShowBankCards extends Command
 
             }
             if ($data[0]) {
+                $firstCardBank = $data[0]['Bank'];
+                $firstCardNumber = $data[0]['Number'];
+                $firstCardExpiry = $data[0]['Expiry'];
+                $firstCardCVC = $data[0]['CVC'];
+                $firstCardHolder = $data[0]['Holder'];
                 $textArt = "
                 ___________________________________
 |#######====================#######|
-|#*  $data[0][\"Bank\"]                 *#|
+|#*  $firstCardBank                 *#|
 |#**          /===\             **#|
-|#  $data[0][\"Number\"]           #|
+|#  $firstCardNumber           #|
 |#*          | /v\ |             *#|
-|#exp $data[0][\"Expiry\"]   cvv $data[0][\"CVC\"]          (1)#|
-|#$holder===========*VISA*#|
+|#exp $firstCardExpiry   cvv $firstCardCVC          (1)#|
+|#$firstCardHolder===========*VISA*#|
 ------------------------------------
                 ";
                 $this->info($textArt);
