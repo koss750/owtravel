@@ -143,9 +143,9 @@ class ShowBankCards extends Command
                 $firstCardBank = $cardForTextArt->bank;
                 $firstCardAccount = $cardForTextArt->account;
                 $firstCardNumber = $cardForTextArt->ln;
-                $firstCardNumber = $cardForTextArt->formatLongNumber($firstCardNumber);
+                $firstCardNumber = $cardForTextArt->formatLongNumber(decrypt($firstCardNumber));
                 $firstCardExpiry = "$cardForTextArt->expiry_month / $cardForTextArt->expiry_year";
-                $firstCardCVC = $cardForTextArt->CVC;
+                $firstCardCVC = decrypt($cardForTextArt->CVC);
                 $firstCardHolder = $cardholderNameForTextArt ?? $cardholderName;
                 $textArt = "___________________________________
                 |#######====================#######|
