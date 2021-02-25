@@ -40,4 +40,19 @@ class BankCard extends BaseModel
         return $newCreditCard;
     }
 
+    public function type($id) {
+        $cardTypeId = $id[0];
+        switch ($cardTypeId)  {
+            case 3:
+                return "AMEX";
+                break;
+            case 4:
+                return "VISA";
+                break;
+            case 5:
+                return "MasterCard";
+                break;
+        }
+    }
+
 }

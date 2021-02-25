@@ -147,6 +147,7 @@ class ShowBankCards extends Command
                 $firstCardExpiry = "$cardForTextArt->expiry_month / $cardForTextArt->expiry_year";
                 $firstCardCVC = decrypt($cardForTextArt->CVC);
                 $firstCardHolder = $cardholderNameForTextArt ?? $cardholderName;
+                $cardType = $cardForTextArt->type($firstCardNumber);
                 $textArt = "
 
                 ___________________________________
@@ -156,7 +157,7 @@ class ShowBankCards extends Command
                 |#  $firstCardNumber           #|
                 |#*          | /v\ |             *#|
                 |#exp $firstCardExpiry   cvv $firstCardCVC          (1)#|
-                |#$firstCardHolder===========*VISA*#|
+                |#$firstCardHolder===========*$cardType*#|
                 ------------------------------------
                 ";
                 $this->info($textArt);
