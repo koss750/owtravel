@@ -24,7 +24,7 @@ class BankCardController extends Controller
     public function showForUser($user_id)
     {
         $user = User::where('id', $user_id)->firstOrFail();
-        return view('greeting')
+        return view('card')
             ->with('cards', $user->cards);
     }
 
