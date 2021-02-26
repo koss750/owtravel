@@ -47,5 +47,13 @@ class User extends Authenticatable
         else return 0;
     }
 
+    /**
+     * Get the bank cards for the user.
+     */
+    public function cards()
+    {
+        return $this->hasMany(BankCard::class);
+    }
+
 
 }

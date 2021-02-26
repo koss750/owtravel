@@ -20,6 +20,13 @@ class BankCard extends BaseModel
         });
     }
 
+    public function showForUser($user_id)
+    {
+        $user = User::where('id', $user_id)->firstOrFail();
+        return view('greeting')
+        ->with('cards', $user->cards);
+    }
+
     public function formatLongNumber($cc) {
         // Clean out extra data that might be in the cc
         $cc = str_replace(array('-',' '),'',$cc);
