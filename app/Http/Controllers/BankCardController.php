@@ -21,6 +21,13 @@ class BankCardController extends Controller
         $this->card = $card;
     }
 
+    public function showForUser($user_id)
+    {
+        $user = User::where('id', $user_id)->firstOrFail();
+        return view('greeting')
+            ->with('cards', $user->cards);
+    }
+
 //    public function index($card){
 //        $docs = BankCard::where();
 //        return $this->respond($this->showCollection($docs,$documentTransformer));
