@@ -25,7 +25,10 @@ class BankCardController extends Controller
     {
         $user = User::where('id', $user_id)->firstOrFail();
         return view('card')
-            ->with('cards', $user->cards);
+            ->with(
+                'cards',
+                $this->respond($this->showCollection($user->cards,new BankCardTransformer)
+            );
     }
 
 //    public function index($card){

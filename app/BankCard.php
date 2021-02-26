@@ -40,6 +40,11 @@ class BankCard extends BaseModel
         return $newCreditCard;
     }
 
+    public function cardholder(BankCard $bankCard) {
+        $user = User::where('id', $bankCard->user_id);
+        return $user->name;
+    }
+
     public function type($id) {
         $cardTypeId = $id[0];
         switch ($cardTypeId)  {
