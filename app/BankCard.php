@@ -41,7 +41,7 @@ class BankCard extends BaseModel
     }
 
     public function cardholder(BankCard $bankCard) {
-        $user = User::where('id', $bankCard->user_id);
+        $user = User::where('id', $bankCard->user_id)->firstOrFail();
         return $user->name;
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BankCard;
+use App\Http\Transformers\BankCardTransformer;
 use App\User;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class BankCardController extends Controller
         return view('card')
             ->with(
                 'cards',
-                $this->respond($this->showCollection($user->cards,new BankCardTransformer)
+                $this->respond($this->showCollection($user->cards,new BankCardTransformer))
             );
     }
 

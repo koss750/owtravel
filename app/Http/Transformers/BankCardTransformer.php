@@ -30,7 +30,7 @@ class BankCardTransformer extends Fractal\TransformerAbstract
 
             return $transformedObject;
         } catch (\Exception $e) {
-            abort(500, "failed to transform document $card->id");
+            abort(500, "failed to transform document $card->id." . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
         }
     }
 
