@@ -36,7 +36,7 @@ class BankCardController extends Controller
         $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is your code: $code";
         $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
-        $this->hookController->sendToIffft("K");
+        $this->hookController->sendTextMessage("K");
 
         switch ($query) {
             case "all":
