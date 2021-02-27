@@ -57,7 +57,7 @@ class BankCardController extends Controller
 
 
         Cache::put($cache_key, $code, $expiresAt);
-        abort (200,"Secure information about $totalCards is protected. To authenticate use code sent to the number +44..4444404");
+        abort (200,"Secure information about $totalCards item(s) is protected. To authenticate use code sent to the number +44..4444404");
     }
 
     public function showForUser($user_id, $code)
