@@ -35,8 +35,8 @@ class BankCardController extends Controller
         $code = rand(100, 1000);
 
         $this->hookController = new LinkHookController;
-        $this->hookController->lineOne = "Here is you verification code";
-        $this->hookController->lineTwo = $code;
+        $this->hookController->lineOne = "Here is your code: $code";
+        $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
         $this->hookController->sendTextMessage("K");
 
         $expiresAt = now()->addMinutes(4);
@@ -47,6 +47,7 @@ class BankCardController extends Controller
     {
         try {
             $savedCode = Cache::pull("pay");
+            Cache::forget("pay");
         } catch (\Exception $e) {
             abort (500,"Code not found");
         }
