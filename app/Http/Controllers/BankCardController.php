@@ -49,9 +49,8 @@ class BankCardController extends Controller
                 break;
         }
         $expiresAt = now()->addMinutes(4);
-        $cards = Cache::remember($cache_key.'_cards', $expiresAt, function()
-        {
-            return DB::table('users')->get();
+        $cards = Cache::remember($cache_key.'_cards', $expiresAt, function() use ($cardsQ) {
+            return $cardsQ->get();
         });
 
         $totalCards = $cards->count();
