@@ -31,6 +31,7 @@ Route::get('/test', 'HomeController@test');
 Route::get('/user/{id}', 'HomeController@my_user');
 Route::get('/pay/{id}/{code}', 'BankCardController@showForUser');
 Route::get('/pay/{id}', 'BankCardController@requestForUser');
+Route::get('/pay/{id}/q/{query?}', 'BankCardController@requestForUser');
 
 Route::post('/file', 'FileController@store');
 

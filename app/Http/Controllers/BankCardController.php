@@ -28,7 +28,7 @@ class BankCardController extends Controller
         $this->card = $card;
     }
 
-    public function requestForUser($user_id)
+    public function requestForUser($user_id, $query = "all")
     {
         $cache_key = "PAY_$user_id";
         $code = rand(100, 1000);
@@ -38,9 +38,27 @@ class BankCardController extends Controller
         $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
         $this->hookController->sendTextMessage("K");
 
+        switch ($query) {
+            case "all":
+                $cardsQ = BankCard::where('user_id', $user_id);
+                break;
+            default:
+                $cardsQ = BankCard::where([
+                    ["user_id", $user_id],
+                    ['bank', 'LIKE', "%$query%"]]);
+                break;
+        }
         $expiresAt = now()->addMinutes(4);
+        $cards = Cache::remember($cache_key.'_cards', $expiresAt, function()
+        {
+            return DB::table('users')->get();
+        });
+
+        $totalCards = $cards->count();
+
+
         Cache::put($cache_key, $code, $expiresAt);
-        abort (200,"Await text with code");
+        abort (200,"Secure information about $totalCards is protected. To authenticate use code sent to the number +44..4444404");
     }
 
     public function showForUser($user_id, $code)
@@ -54,19 +72,16 @@ class BankCardController extends Controller
             abort (500,"Code not found");
         }
         if ($savedCode == $code) {
-            $user = User::where('id', $user_id)->firstOrFail();
-            $cards = $user->cards;
             return view('card')
                 ->with(
                     'cards',
-                    $this->respond($this->showCollection($user->cards,new BankCardTransformer))
+                    Cache::pull($cache_key.'_cards')
                 )
                 ->with(
                     'code',
                     $code
                 );
-        }
-        else {
+        } else {
             abort(500, "Wrong  Code");
         }
     }
