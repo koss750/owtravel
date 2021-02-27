@@ -31,12 +31,12 @@ class BankCardController extends Controller
     public function requestForUser($user_id, $query = "all")
     {
         $cache_key = "PAY_$user_id";
-        $code = rand(100, 1000);
+        $code = rand(10000, 1000000);
 
         $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is your code: $code";
         $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
-        $this->hookController->sendTextMessage("K");
+        $this->hookController->sendToIffft("K");
 
         switch ($query) {
             case "all":
