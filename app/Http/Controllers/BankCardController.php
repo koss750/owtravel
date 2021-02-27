@@ -53,7 +53,6 @@ class BankCardController extends Controller
         if ($savedCode == $code) {
             $user = User::where('id', $user_id)->firstOrFail();
             $cards = $user->cards;
-            $cards['code'] = rand(100, 1000);
             return view('card')
                 ->with(
                     'cards',
