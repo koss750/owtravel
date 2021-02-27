@@ -682,7 +682,7 @@ class LinkHookController extends Controller
         $temperature = round(($response->temperature - 32) / 1.8);
         $rainChance = $response->precipProbability*100;
         $rainPower = $response->precipIntensity*10000;
-        $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');    
+        $sunrise = Carbon::createFromTimestamp($dailyData->sunriseTime)->format('g:i');
         $sunset = Carbon::createFromTimestamp($dailyData->sunsetTime)->format('g:i');
         $maxTemp = round(($dailyData->temperatureHigh - 32) / 1.8);
         $minTemp = round(($dailyData->temperatureLow - 32) / 1.8);
@@ -818,8 +818,9 @@ class LinkHookController extends Controller
             );
 
             $logValue = $this->lineOne . " " . $this->lineTwo;
-
-            $this->log($api, $this->action, $logValue);
+            try {
+                $this->log($api, $this->action, $logValue);
+            } catch (\Exception $e) {}
 
         } catch (\Exception $e) {
 

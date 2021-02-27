@@ -6,6 +6,7 @@ use App\BankCard;
 use App\Http\Transformers\BankCardTransformer;
 use App\User;
 use http\Client\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BankCardController extends Controller
 {
@@ -25,7 +26,6 @@ class BankCardController extends Controller
 
     public function _construct($card){
         $this->card = $card;
-        $this->hookController = new LinkHookController;
     }
 
     public function requestForUser($user_id)
@@ -34,22 +34,23 @@ class BankCardController extends Controller
         $cards = $user->cards;
         $code = rand(100, 1000);
 
+        $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is you verification code";
         $this->hookController->lineTwo = $cards['code'];
         $this->hookController->sendTextMessage("K");
 
-        $response = new Illuminate\Http\Response('Request received');
-        $response->withCookie(cookie('code', $code, 5));
+        $expiresAt = now()->addMinutes(4);
+        Cache::put("pay", $code, $expiresAt);
     }
 
     public function showForUser($user_id, $code)
     {
         try {
-            $cookie = Request::cookie('name');
+            $savedCode = Cache::pull("pay");
         } catch (\Exception $e) {
-            abort (500,"Cookie not found");
+            abort (500,"Code not found");
         }
-        if ($cookie == $code) {
+        if ($savedCode == $code) {
             $user = User::where('id', $user_id)->firstOrFail();
             $cards = $user->cards;
             $cards['code'] = rand(100, 1000);
@@ -62,6 +63,9 @@ class BankCardController extends Controller
                     'code',
                     $cards['code']
                 );
+        }
+        else {
+            abort(500, "Wrong  Code");
         }
     }
 
