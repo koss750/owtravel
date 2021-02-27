@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\BankCard;
 use App\Http\Transformers\BankCardTransformer;
 use App\User;
-use Illuminate\Http\Request;
+use http\Client\Request;
 
 class BankCardController extends Controller
 {
@@ -18,18 +18,51 @@ class BankCardController extends Controller
      */
     public $user;
 
+    /**
+     * @var LinkHookController $controller
+     */
+    private $hookController;
+
     public function _construct($card){
         $this->card = $card;
+        $this->hookController = new LinkHookController;
     }
 
-    public function showForUser($user_id)
+    public function requestForUser($user_id)
     {
         $user = User::where('id', $user_id)->firstOrFail();
-        return view('card')
-            ->with(
-                'cards',
-                $this->respond($this->showCollection($user->cards,new BankCardTransformer))
-            );
+        $cards = $user->cards;
+        $code = rand(100, 1000);
+
+        $this->hookController->lineOne = "Here is you verification code";
+        $this->hookController->lineTwo = $cards['code'];
+        $this->hookController->sendTextMessage("K");
+
+        $response = new Illuminate\Http\Response('Request received');
+        $response->withCookie(cookie('code', $code, 5));
+    }
+
+    public function showForUser($user_id, $code)
+    {
+        try {
+            $cookie = Request::cookie('name');
+        } catch (\Exception $e) {
+            abort (500,"Cookie not found");
+        }
+        if ($cookie == $code) {
+            $user = User::where('id', $user_id)->firstOrFail();
+            $cards = $user->cards;
+            $cards['code'] = rand(100, 1000);
+            return view('card')
+                ->with(
+                    'cards',
+                    $this->respond($this->showCollection($user->cards,new BankCardTransformer))
+                )
+                ->with(
+                    'code',
+                    $cards['code']
+                );
+        }
     }
 
 //    public function index($card){
