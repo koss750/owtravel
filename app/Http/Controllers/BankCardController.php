@@ -74,7 +74,7 @@ class BankCardController extends Controller
             return view('card')
                 ->with(
                     'cards',
-                    Cache::pull($cache_key.'_cards')
+                    $this->respond($this->showCollection(Cache::pull($cache_key.'_cards'),new BankCardTransformer))
                 )
                 ->with(
                     'code',
