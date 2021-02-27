@@ -30,8 +30,7 @@ class BankCardController extends Controller
 
     public function requestForUser($user_id)
     {
-        $user = User::where('id', $user_id)->firstOrFail();
-        $cards = $user->cards;
+        $cache_key = "PAY_$user_id";
         $code = rand(100, 1000);
 
         $this->hookController = new LinkHookController;
@@ -40,14 +39,17 @@ class BankCardController extends Controller
         $this->hookController->sendTextMessage("K");
 
         $expiresAt = now()->addMinutes(4);
-        Cache::put("pay", $code, $expiresAt);
+        Cache::put($cache_key, $code, $expiresAt);
+        abort (200,"Await text with code");
     }
 
     public function showForUser($user_id, $code)
     {
+        $cache_key = "PAY_$user_id";
+
         try {
-            $savedCode = Cache::pull("pay");
-            Cache::forget("pay");
+            $savedCode = Cache::pull($cache_key);
+            Cache::forget($cache_key);
         } catch (\Exception $e) {
             abort (500,"Code not found");
         }
