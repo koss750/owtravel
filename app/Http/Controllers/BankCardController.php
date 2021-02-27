@@ -36,7 +36,7 @@ class BankCardController extends Controller
 
         $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is you verification code";
-        $this->hookController->lineTwo = $cards['code'];
+        $this->hookController->lineTwo = $code;
         $this->hookController->sendTextMessage("K");
 
         $expiresAt = now()->addMinutes(4);
