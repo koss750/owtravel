@@ -60,7 +60,7 @@ class BankCardController extends Controller
                 )
                 ->with(
                     'code',
-                    $cards['code']
+                    $code
                 );
         }
         else {
