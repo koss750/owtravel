@@ -33,10 +33,6 @@ class BankCardController extends Controller
         $cache_key = "PAY_$user_id";
         $code = rand(10000, 1000000);
 
-        $this->hookController = new LinkHookController;
-        $this->hookController->lineOne = "Here is your code: $code";
-        $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
-        $this->hookController->sendTextMessage("K");
 
         switch ($query) {
             case "all":
@@ -49,6 +45,10 @@ class BankCardController extends Controller
                 break;
         }
         $expiresAt = now()->addMinutes(4);
+        $this->hookController = new LinkHookController;
+        $this->hookController->lineOne = "Here is your code: $code";
+        $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
+        $this->hookController->sendTextMessage("K");
         $cards = Cache::remember($cache_key.'_cards', $expiresAt, function() use ($cardsQ) {
             return $cardsQ->get();
         });
