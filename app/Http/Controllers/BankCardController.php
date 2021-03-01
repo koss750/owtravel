@@ -48,7 +48,8 @@ class BankCardController extends Controller
         $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is your code: $code";
         $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
-        $this->hookController->sendTextMessage("K");
+        if ($query=!"l") $this->hookController->sendTextMessage("L");
+        else $this->hookController->sendTextMessage("L");
         $cards = Cache::remember($cache_key.'_cards', $expiresAt, function() use ($cardsQ) {
             return $cardsQ->get();
         });
