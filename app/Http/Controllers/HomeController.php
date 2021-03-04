@@ -85,6 +85,8 @@ class HomeController extends Controller
 
             $result = $generalString . $suffix[$type] . $p;
 
+            echo $result;
+
 
         }
 
