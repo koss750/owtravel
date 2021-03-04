@@ -65,7 +65,18 @@ class HomeController extends Controller
 
         public function generatePassword ($provider, $iteration = 1, $type = "general") {
 
-            $convertIteration = $iteration*$iteration+$iteration*7+1;
+            $envParams = explode(",", env('PASS_GEN_VALUES'));
+            $generalString = $envParams[0];
+            $multiplyParam = $envParams[1];
+            $unitParam = $envParams[2];
+
+            $base = base64_encode($provider);
+            $baseString = lcfirst($base)[0] . strtoupper($base)[1];
+
+            $suffix['general'] = $envParams[3];
+            $suffix['secure'] = $baseString . $envParams[4];
+
+            $convertIteration = $iteration*$iteration+$iteration*$multiplyParam+$unitParam;
             $c = $convertIteration;
 
             $validType = in_array($type,
@@ -76,11 +87,7 @@ class HomeController extends Controller
 
             if (!$validType) abort (500, "invalid type");
 
-            $generalString = "RosGosKos";
-            $suffix['general'] = "A1!";
-            $suffix['secure'] = "!A0!";
-
-            $providerString = lcfirst($provider)[0] . $c . ucfirst($provider)[1];
+            $providerString = lcfirst($provider)[0] . $c . strtoupper($provider)[1];
             $p = $providerString;
 
             $result = $generalString . $suffix[$type] . $p;
