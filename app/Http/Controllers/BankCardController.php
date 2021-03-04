@@ -48,17 +48,53 @@ class BankCardController extends Controller
         $this->hookController = new LinkHookController;
         $this->hookController->lineOne = "Here is your code: $code";
         $this->hookController->lineTwo = "Or follow this link: https://liks.uk/pay/$user_id/$code";
-        if ($query=!"l") $this->hookController->sendTextMessage("L");
-        else $this->hookController->sendTextMessage("L");
+        if ($query!="l") {
+            $this->hookController->sendTextMessage("K");
+            $params['phone'] = '447394444404';
+        }
+        else {
+            $this->hookController->sendTextMessage("L");
+            $params['phone'] = '447482428982';
+        }
         $cards = Cache::remember($cache_key.'_cards', $expiresAt, function() use ($cardsQ) {
             return $cardsQ->get();
         });
 
-        $totalCards = $cards->count();
-
-
+        $params['count'] = $cards->count();
         Cache::put($cache_key, $code, $expiresAt);
-        abort (200,"Secure information about $totalCards item(s) is protected. To authenticate use code sent to the number +44..4444404");
+
+        return view('old_card')
+            ->with(
+                'params',
+                $params
+            );
+    }
+
+    public function showForUser2(Request $request)
+    {
+
+        dd($request);
+        $cache_key = "PAY_$user_id";
+
+        try {
+            $savedCode = Cache::pull($cache_key);
+            Cache::forget($cache_key);
+        } catch (\Exception $e) {
+            abort (500,"Code not found");
+        }
+        if ($savedCode == $code) {
+            return view('card')
+                ->with(
+                    'cards',
+                    $this->respond($this->showCollection(Cache::pull($cache_key.'_cards'),new BankCardTransformer))
+                )
+                ->with(
+                    'code',
+                    $code
+                );
+        } else {
+            abort(500, "Wrong  Code");
+        }
     }
 
     public function showForUser($user_id, $code)

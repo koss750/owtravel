@@ -63,6 +63,31 @@ class HomeController extends Controller
                 ], 201);
         }
 
+        public function generatePassword ($provider, $iteration = 1, $type = "general") {
+
+            $convertIteration = $iteration*$iteration+$iteration*7+1;
+            $c = $convertIteration;
+
+            $validType = in_array($type,
+            [
+                "secure",
+                "general"
+            ]);
+
+            if (!$validType) abort (500, "invalid type");
+
+            $generalString = "RosGosKos";
+            $suffix['general'] = "A1!";
+            $suffix['secure'] = "!A0!";
+
+            $providerString = lcfirst($provider)[0] . $c . ucfirst($provider)[1];
+            $p = $providerString;
+
+            $result = $generalString . $suffix[$type] . $p;
+
+
+        }
+
         /**
          * Login user and create token
          *
