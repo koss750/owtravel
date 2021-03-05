@@ -89,11 +89,35 @@ class HomeController extends Controller
 
             $providerString = lcfirst($provider)[0] . $c . strtoupper($provider)[1];
             $p = $providerString;
+            $r = $generalString . $suffix[$type] . $p;
+            $expiresAt = now()->addMinutes(2);
+            $result = Cache::remember('pas', $expiresAt, function() use ($r) {
+                return $r;
+            });
 
-            $result = $generalString . $suffix[$type] . $p;
+            $code = rand(10000, 1000000);
+            Cache::put('pas_code', $code, $expiresAt);
+            $this->hookController = new LinkHookController;
+            $this->hookController->lineOne = "Here is your code: $code";
+            $this->hookController->sendTextMessage("K");
 
-            echo $result;
+            echo "ok";
 
+
+        }
+
+        public function revealPassword ($code) {
+
+
+            try {
+                $savedCode = Cache::pull('pas_code');
+                Cache::forget('pas_code');
+            } catch (\Exception $e) {
+                abort (500,"Code not found");
+            }
+            if ($savedCode == $code) {
+                echo Cache::pull('pas');
+            }
 
         }
 
