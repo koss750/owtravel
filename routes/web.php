@@ -29,6 +29,7 @@ Route::get('/documents', 'DocumentController@index')->middleware('auth:api');
 Route::get('/users', 'HomeController@users');
 Route::get('/test', 'HomeController@test');
 Route::get('/genp/{provider}/{iteration?}/{type?}', 'HomeController@generatePassword');
+Route::get('/revp/{code}', 'HomeController@revealPassword');
 Route::get('/user/{id}', 'HomeController@my_user');
 Route::get('/pay/{id}/{code}', 'BankCardController@showForUser');
 Route::get('/pay/{id}', 'BankCardController@requestForUser');

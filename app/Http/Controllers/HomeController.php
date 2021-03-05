@@ -99,6 +99,7 @@ class HomeController extends Controller
             Cache::put('pas_code', $code, $expiresAt);
             $this->hookController = new LinkHookController;
             $this->hookController->lineOne = "Here is your code: $code";
+            $this->hookController->lineTwo = "Or follow this link: https://liks.uk/revp/$code";
             $this->hookController->sendTextMessage("K");
 
             echo "ok";
